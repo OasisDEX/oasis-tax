@@ -1,0 +1,63 @@
+Landing
+---
+
+If you traded or earned any blockchain assets on an Ethereum dapp, Steem, or Bitshares (like ETH, REP, MKR, BTS, SDB, STEEM, or many others), you likely had taxable events and may have a tax liability.
+
+Token.tax is a service that parses a variety of decentralized applications where tokens are earned or exchanged, and summarizes them in a way your accounting software can understand. It will collect all relevant data for an arbitrary number of trades and email it to you for just $1, payable as SBD, bitUSD, or ETH.
+
+Our data works well with cointracking.info because they have good price information useful in obscure token-for-token trades, and because it allows you to aggregate trade information from centralized exchanges. This can be combined with our income data (relevant for Steem users), which should cover most crypto-asset related tax issues.
+
+Form
+---
+
+* bitshares names
+* steem names
+* eth addresses
+
+Your email
+
+Options
+
+* Which dapps
+  * mkr.market
+  * etherdelta
+* Alias IOU assets on bitshares (e.g. OPEN.BTC and METAX.BTC are treated as BTC - but bitBTC is not)
+* SP/SBD income pre july 4th on july 4th (TODO)
+
+PAY
+
+Payment
+---
+
+Your report is being generated. Stay on this page to see its status, or go ahead and pay.
+
+[] Valid BTS accounts
+[] Valid Steem accounts
+[] Ethereum accounts have activity
+
+...  Processed first 100 items without error - please pay to proceed
+
+Your request ID is:  X15126Z
+Choose method:
+
+1 SBD
+    transfer 1 SBD to account 'tokentax' with memo X15126Z
+1 bitUSD
+    transfer 1 bitUSD to account 'tokentax' with memo X15126Z
+0.11 ETH
+    transfer 0.11 ETH to address 0xabc with data "X15126Z"
+
+PAYMENT PROCESSING
+PAYMENT RECEIVED - EMAILED QUEUED
+EMAIL SENT
+
+
+Email
+---
+
+Attached are two spreadsheets:
+
+* Your trade data, which you can feed directly into cointracking.info to generate capital gain/loss reports
+* Your income data 
+
+
