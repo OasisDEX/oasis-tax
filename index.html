@@ -8,25 +8,28 @@ textarea, input[type=email] { width: 100%; margin-bottom: 1rem; }
 textarea, input[type=email] { font: 1rem/1.5rem monospace; }
 textarea { height: 6rem; }
 button { font: inherit; padding: .2rem 1rem; }
-.mark { background: #36c; color: white; padding: 2rem 1.25rem 1rem; }
+.mark { background: #36c; color: white; padding: 2rem 1.25rem .75rem; }
 .mark { font: 1rem sans-serif; }
 .logo { position: absolute; top: 0; left: 1rem; padding-top: 1.5rem; }
 .tag { color: gray; margin-left: 1rem; font-size: 90%; }
+.tag a { color: inherit; }
+.mark { border-bottom-left-radius: .5rem; }
+.mark { border-bottom-right-radius: .5rem; }
 body { position: relative; }
 </style>
 <div class=logo>
-  <span class=mark><b>Token</b>.Tax</span>
-  <span class=tag>a DappHub service</span>
+  <span class=mark><b>Token</b>.tax</span>
+  <span class=tag>a <a href=https://dapphub.com>DappHub.com</a> service</span>
 </div>
 
-<h1>Calculate capital gains tax on your token trades</h1>
+<h1>Compute capital gains and income from your blockchain activity</h1>
 
 <p>If you traded or earned any blockchain assets (such as ETH, REP,
 MKR, DGD, BTS, SDB, STEEM, or many others) on an Ethereum dapp or on
 Steem or BitShares, you likely had taxable events and may have a
 tax liability.
 
-<p>Token.Tax is a service that parses a variety of decentralized apps
+<p>Token.tax is a service that parses a variety of decentralized apps
 and blockchains where tokens are earned and/or exchanged, and
 summarizes them in a way your accounting software can understand. It
 will collect all relevant data for an arbitrary number of trades and

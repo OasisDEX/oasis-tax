@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -e -o pipefail
+
+cat <<.
+"Type","Buy","Cur.","Sell","Cur.","Fee","Cur.","Exchange","Group","Comment","Date"
+.
+
+exchange="Maker Market"
+makermarket trades "${1?}" |
+while read date buywad buygem sellwad sellgem; do
+  cat <<.
+"Trade","$buywad","$buygem","$sellwad","$sellgem","$fee","$feegem","$exchange","$group","$comment","$date"
+.
+done
