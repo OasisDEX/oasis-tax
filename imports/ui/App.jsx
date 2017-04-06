@@ -49,12 +49,6 @@ class App extends Component {
 
     }
 
-    /*
-     <Export
-     accounts={this.state.accounts}
-     />
-     */
-
     render() {
         return (
             <div className="container">
@@ -72,6 +66,8 @@ class App extends Component {
                     addAccount={this.addAccount.bind(this)}
                     removeAccount={this.removeAccount.bind(this)}
                 />
+                <Export
+                    services={this.state.services}/>
             </div>
         );
     }

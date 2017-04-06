@@ -17,12 +17,11 @@ export default class Settings extends Component {
 
     checkEthereum(){
         var hasEthereum = false;
-        this.props.accounts.map( (account) => {
-            if (account.provider === 'Ethereum') {
-                console.log("Provider:" + account.provider);
+        let service = this.props.services.filter((service) => service.type === 'ethereum');
+            if (service[0].accounts.length > 0 ) {
                 hasEthereum = true;
             }
-        });
+
         return hasEthereum;
     }
 
@@ -50,7 +49,9 @@ export default class Settings extends Component {
 
 
 Settings.PropTypes = {
-    accounts: PropTypes.arrayOf(PropTypes.shape({
-        provider: PropTypes.string.isRequired,
-    })).isRequired,
+    services: PropTypes.arrayOf(
+        PropTypes.shape({
+            accounts: PropTypes.array.isRequired,
+            type: PropTypes.string.isRequired,
+        })).isRequired,
 };

@@ -10,7 +10,7 @@ export default class Export extends Component {
             <div className="panel-heading">
                 Export Settings
             </div>
-            <Settings accounts={this.props.accounts}/>
+            <Settings services={this.props.services}/>
             <div className="panel-body">
                 <div className="row">
 
@@ -36,8 +36,9 @@ export default class Export extends Component {
 }
 
 Export.PropTypes = {
-    accounts: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        provider: PropTypes.string.isRequired,
-    })).isRequired,
+    services: PropTypes.arrayOf(
+        PropTypes.shape({
+            accounts: PropTypes.array.isRequired,
+            type: PropTypes.string.isRequired,
+        })).isRequired,
 };
