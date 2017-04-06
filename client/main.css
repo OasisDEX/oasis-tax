@@ -131,6 +131,14 @@ input:-ms-input-placeholder {
     outline: none;
 }
 
+.panel {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .10);
+}
+
+.panel-default {
+    border-color: #EEEEEE;
+}
+
 .panel-heading {
     background-color: white !important;
     padding: 15px 15px;
@@ -160,6 +168,24 @@ input:-ms-input-placeholder {
     }
 }
 
+.navbar-default {
+    background-color: #039BE5;
+    border-color: #028ED4;
+    border-bottom-left-radius: 14px;
+    border-bottom-right-radius: 14px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .25);
+}
 
+.navbar-default .navbar-brand {
+    color: #FFFFFF;
+}
+
+@media (min-width: 768px){
+    .navbar {
+
+    }
+}
 .btn-default:hover,
 .btn-default:visited { border-color: #E7EBED; background: #FAFDFF; outline: none; }

@@ -58,12 +58,20 @@ class App extends Component {
     render() {
         return (
             <div className="container">
+                <nav className="navbar navbar-default">
+                    <div className="container-fluid">
+                        <div className="navbar-header">
+                            <a className="navbar-brand" href="#">Token.tax</a>
+                            <a className="navbar-brand" href="#">a Dapphub.com Service</a>
+                        </div>
+
+                    </div>
+                </nav>
                 <Source
                     services={this.state.services}
                     addAccount={this.addAccount.bind(this)}
                     removeAccount={this.removeAccount.bind(this)}
                 />
-
             </div>
         );
     }
