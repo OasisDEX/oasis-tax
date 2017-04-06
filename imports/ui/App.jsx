@@ -4,8 +4,8 @@ import { createContainer } from 'meteor/react-meteor-data';
 import Web3 from 'web3';
 
 import update from 'react-addons-update';
-import Source from "./components/cards/source";
-import Export from "./components/cards/export";
+import Source from "./cards/source";
+import Export from "./cards/export";
 
 
 live =  {
