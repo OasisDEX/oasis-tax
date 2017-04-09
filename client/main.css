@@ -158,15 +158,46 @@ input:-ms-input-placeholder {
     text-transform:uppercase;
 }
 
+.account-item-service {
+    display: inline-block;
+    line-height:25px;
+}
+
+.account-item-name {
+    line-height: 25px;
+}
+
+.export{
+    margin-bottom: 0;
+}
+
+.service-text:first-letter {
+    text-transform:uppercase !important;
+}
+
+.btn-generate {
+    float:right;
+    background-color: #039BE5;
+    border-color: #028ED4;
+    padding: 10px 28px;
+    border-radius:4px;
+}
+
+.btn-back {
+    float:right;
+    background-color: #43A047;
+    border-color: #3B8C3F;
+    padding: 10px 28px;
+    margin-right:15px;
+    border-radius:4px;
+}
+
+
 .picker-container {
     padding-top: 15px;
 }
 
-@media (min-width: 1200px){
-    .container {
-        width: 970px;
-    }
-}
+
 
 .navbar-default {
     background-color: #039BE5;
@@ -180,6 +211,12 @@ input:-ms-input-placeholder {
 
 .navbar-default .navbar-brand {
     color: #FFFFFF;
+}
+
+@media (min-width: 1200px){
+    .container {
+        width: 970px;
+    }
 }
 
 @media (min-width: 768px){

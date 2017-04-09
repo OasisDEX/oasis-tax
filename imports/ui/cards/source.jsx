@@ -22,20 +22,11 @@ export default class Source extends Component {
                 <div className="panel-heading">
                     Source
                 </div>
-
-                <Services
-                    services={this.props.services}
-                    removeAccount={this.removeAccount.bind(this)}/>
-
-                <Picker
-                    defaultService={this.state.pickedService.name}
-                    changePlaceHolderText={this.changePlaceHolder.bind(this)}
-                />
+                <Services services={this.props.services} removeAccount={this.removeAccount.bind(this)}/>
+                <Picker defaultService={this.state.pickedService} changePlaceHolderText={this.changePlaceHolder.bind(this)}/>
 
                 <div className="panel-body">
-                    <InputGroup
-                        placeHolder={'Enter ' + this.state.pickedService.name + ' ' + this.state.pickedService.type }
-                        handleSubmit={this.handleSubmit.bind(this)}/>
+                <InputGroup placeHolder={"Enter " + this.state.pickedService.name + " " + this.state.pickedService.type} handleSubmit={this.handleSubmit.bind(this)}/>
                 </div>
             </div>
         );
@@ -43,26 +34,17 @@ export default class Source extends Component {
 
     removeAccount(accRemov){
 
-        let newServices;
 
-        let service = this.props.services.filter((accounts) => accounts.type === accRemov.provider)[0];
-
-        service.accounts.map( (acc,index) => {
-            if(acc.name === accRemov.name){
-                switch(accRemov.provider) {
-                    case 'ethereum':
-                        newServices = update(this.props.services, {0: {accounts: {$splice: [[index, 1]]}}});
-                        break;
-                    case 'steem':
-                        newServices = update(this.props.services, {1: {accounts: {$splice: [[index, 1]]}}});
-                        break;
-                    case 'bitshares':
-                        newServices = update(this.props.services, {2: {accounts: {$splice: [[index, 1]]}}});
-                        break;
-                }
+       let service = this.props.services.filter((accounts) => accounts.type === accRemov.provider)[0];
+        service.accounts.map( (account,index) => {
+            if(account.name === accRemov.name){
+                service.accounts.splice(index,1);
             }
         });
-        this.props.removeAccount(newServices);
+
+        let changedServices = this.props.services;
+
+        this.props.changeState(changedServices);
 
     }
 
@@ -82,31 +64,17 @@ export default class Source extends Component {
         let serviceName = this.state.pickedService.name;
 
         let service = this.props.services.filter((service) => service.type === serviceName);
-        let account = service[0].accounts.filter( (account) => account.name === accountName);
+        let serviceAccounts = service[0].accounts.filter( (account) => account.name === accountName);
 
-        if(account.length === 0){
+        if(serviceAccounts.length === 0){
 
             let account = {
                 name: accountName,
                 provider: serviceName,
             };
-
-            let newServices;
-
-            switch(serviceName){
-                case 'ethereum':
-                    newServices = update(this.props.services, {0: { accounts: {$push: [account]}}});
-                    break;
-                case 'steem':
-                    newServices = update(this.props.services, {1: { accounts: {$push: [account]}}});
-                    break;
-                case 'bitshares':
-                    newServices = update(this.props.services, {2: { accounts: {$push: [account]}}});
-                    break;
-            }
-            console.log(newServices);
-
-            this.props.addAccount(newServices);
+            service[0].accounts.push(account);
+            let la = this.props.services;
+            this.props.changeState(la);
         }else{
             alert("duplicate");
         }
@@ -124,7 +92,6 @@ Source.PropTypes = {
             accounts: PropTypes.array.isRequired,
             type: PropTypes.string.isRequired,
     })).isRequired,
-    addAccount: PropTypes.func.isRequired,
-    removeAccount: PropTypes.func.isRequired,
+    changeState: PropTypes.func.isRequired,
 
 };

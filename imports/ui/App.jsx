@@ -1,29 +1,17 @@
-import React, { Component } from 'react'
-import { createContainer } from 'meteor/react-meteor-data';
+import React, { Component, PropTypes } from 'react';
+import {BrowserRouter as Router, Link, Route} from 'react-router-dom';
+import createBrowserHistory from 'history/createBrowserHistory';
+
+const history = createBrowserHistory();
 
 import Web3 from 'web3';
-
 import update from 'react-addons-update';
 import Source from "./cards/source";
-import Export from "./cards/export";
+import Export from './cards/export';
+import Services from "./lists/services";
 
 
-live =  {
-    '0x53eccc9246c1e537d79199d0c7231e425a40f896': 'ETH',
-    '0x4bb514a7f83fbb13c2b41448208e89fabbcfe2fb': 'MKR',
-    '0xbb7697d091a2b9428053e2d42d088fcd2a6a0aaf': 'DGD',
-    '0xece9fa304cc965b00afc186f5d0281a00d3dbbfd': 'GNT',
-    '0xbd1ceb35769eb44b641c8e257005817183fc2817': 'W-GNT',
-    '0x99e846cfe0321260e51963a2114bc4008d092e24': 'REP',
-    '0x8a55df5de91eceb816bd9263d2e5f35fd516d4d0': 'ICN',
-    '0x846f258ac72f8a60920d9b613ce9e91f8a7a7b54': '1ST',
-    '0xf7d57c676ac2bc4997ca5d4d34adc0d072213d29': 'SNGLS',
-    '0x2e65483308968f5210167a23bdb46ec94752fe39': 'VSL',
-    '0x00a0fcaa32b47c4ab4a8fdda6d108e5c1ffd8e4f': 'PLU',
-    '0xc3ce96164012ed51c9b1e34a9323fdc38c96ad8a': 'MLN',
-};
-
-class App extends Component {
+export default class App extends Component {
 
 
     constructor(props){
@@ -37,54 +25,79 @@ class App extends Component {
             console.log("new");
         }
 
-        this.state = {
-            buys: [],
-            sells: [],
-            services: [
-                { accounts: [], type: "ethereum"},
-                { accounts: [], type: "steem"},
-                { accounts: [], type: "bitshares"},
-                      ],
-        };
-
     }
 
     render() {
-        return (
-            <div className="container">
-                <nav className="navbar navbar-default">
-                    <div className="container-fluid">
-                        <div className="navbar-header">
-                            <a className="navbar-brand" href="#">Token.tax</a>
-                            <a className="navbar-brand" href="#">a Dapphub.com Service</a>
-                        </div>
 
-                    </div>
-                </nav>
-                <Source
-                    services={this.state.services}
-                    addAccount={this.addAccount.bind(this)}
-                    removeAccount={this.removeAccount.bind(this)}
-                />
-                <Export
-                    services={this.state.services}/>
+        const InterfaceHome = () => (
+            <div>
+                <Source services={this.props.services} changeState={this.changeState.bind(this)} />
+                <Export services={this.props.services}/>
+                <Link to={'/payment'}>
+                    <button type="button" className="btn btn-primary btn-generate">Generate</button>
+                </Link>
             </div>
         );
+
+        const CardGenerate = () => (
+            <div className="panel panel-default">
+                <div className="panel-heading">
+                    Generate Report
+                </div>
+                <Services services={this.props.services} removeAccount={this.changeState.bind(this)}/>
+            </div>
+        );
+
+        const CardPayment = () => (
+            <div className="panel panel-default">
+                <div className="panel-heading">
+                    Payment
+                </div>
+            </div>
+        );
+
+        const InterfacePayment = () => (
+            <div>
+            {CardGenerate()}
+            {CardPayment()}
+            <button type="button" className="btn btn-primary btn-generate">Download</button>
+                <Link to={'/'}>
+                <button type="button" className="btn btn-primary btn-back">Back</button>
+            </Link>
+            </div>
+        );
+
+        return (
+            <Router history={history}>
+                <div>
+
+                <div className="container">
+                    <nav className="navbar navbar-default">
+                        <div className="container-fluid">
+                            <div className="navbar-header">
+                                <a className="navbar-brand" href="#">Token.tax</a>
+                                <a className="navbar-brand" href="#">a Dapphub.com Service</a>
+                            </div>
+
+                        </div>
+                    </nav>
+                    <Route exact path="/" component={InterfaceHome}/>
+                    <Route  path="/payment" component={InterfacePayment}/>
+                </div>
+
+                </div>
+            </Router>
+        );
+
     }
 
-    removeAccount(service){
-        this.setState( (state) =>
-            update(state, {
-                services: {$set: service}
-            }));
+    changeState(service){
+        this.setState({
+            services: service,
+        });
     }
 
-    addAccount(service){
-        this.setState( (state) =>
-            update(state, {
-                services: {$set: service}
-            }));
-    }
+
 
     handleEvent(){
 
@@ -136,9 +149,19 @@ class App extends Component {
             //  JSONToCSVConvertor(this.trades.buys, "TokenTax-Report", true);
         });
     }
+
 }
 
-export default createContainer(() => {return {};}, App);
+App.PropTypes = {
+    buys: PropTypes.array.isRequired,
+    sells: PropTypes.array.isRequired,
+    services: PropTypes.arrayOf(
+        PropTypes.shape({
+            accounts: PropTypes.array.isRequired,
+            type: PropTypes.string.isRequired,
+        })).isRequired,
+};
+
 
 
 function JSONToCSVConvertor(JSONData, ReportTitle, ShowLabel) {
