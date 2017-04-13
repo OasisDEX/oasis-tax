@@ -8,12 +8,12 @@ export default class Account extends Component {
               <li className="list-group-item">
                 <div className="row">
                 <div className="col-xs-12 col-md-2">
-                        <span className="text">{this.checkVisibility()}</span>
+                        <span className="account-item-service">{this.checkVisibility()}</span>
                 </div>
                 <div className="col-xs-12 col-md-10 npl">
                 <div className="col-xs-11 col-md-11">
                                                 <span
-                                                    className="text"
+                                                    className="account-item-name"
                                                     ref={(accountName) => this.accountName = accountName}
                                                 >{this.props.account.name}
                                              </span>

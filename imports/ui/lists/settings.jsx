@@ -28,15 +28,18 @@ export default class Settings extends Component {
     renderEthereumSettings() {
         if(this.checkEthereum()) {
             return (
-                <ul className="list-group">
+                <ul className="list-group export">
                     { settingsETH.map((setting) => (
-                    <li className="list-group-item" key={setting.id}>
-                            <input
-                                type="checkbox"
-                                name='data-layer-group'
-                                defaultChecked={setting.active}
-                            />
-                            <span className="text">{setting.option}</span>
+                        <li className="list-group-item" key={setting.id}>
+                            <div className="checkbox">
+                                <label>
+                                    <input type="checkbox"
+                                           value=""
+                                           defaultChecked={setting.id === 0}
+                                    />
+                                    {setting.option}
+                                </label>
+                            </div>
                         </li>
                     ))}
                 </ul>
