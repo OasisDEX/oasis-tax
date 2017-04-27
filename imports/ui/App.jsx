@@ -1,17 +1,16 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 import {BrowserRouter as Router, Link, Route} from 'react-router-dom';
 import createBrowserHistory from 'history/createBrowserHistory';
+import Web3 from 'web3';
+import Source from "./components/source";
+import Export from './components/export';
+import Services from "./lists/services";
+import { createContainer } from 'meteor/react-meteor-data';
 
 const history = createBrowserHistory();
 
-import Web3 from 'web3';
-import update from 'react-addons-update';
-import Source from "./cards/source";
-import Export from './cards/export';
-import Services from "./lists/services";
 
-
-export default class App extends Component {
+export class App extends Component {
 
 
     constructor(props){
@@ -25,17 +24,64 @@ export default class App extends Component {
             console.log("new");
         }
 
+        this.state = {
+            active: 0,
+            buys: [],
+            sells: [],
+            services: [
+                {
+                    id: 0,
+                    accounts: [],
+                    provider: 'ethereum',
+                    type: 'address',
+                    url: 'oasisdex.com',
+                    options: [
+                        { active: true, option: 'Load data from Oasis (https://oasisdex.com)'},
+                        { active: false, option: 'Load data from Etherdelta (https://ether.delta)'},
+                ]},
+                {
+                    id: 1,
+                    accounts: [],
+                    provider: 'steem',
+                    type: 'username',
+                    url: 'steemit.com',
+                    options: []
+                },
+                {
+                    id: 2,
+                    accounts: [],
+                    provider: 'bitshares',
+                    type: 'username',
+                    url: 'bitshares.org',
+                    options: [
+                        { active: false, option: 'Alias IOU assets on Bitshares'},
+                ]},
+            ],
+            email: '',
+        };
     }
 
     render() {
 
         const InterfaceHome = () => (
             <div>
-                <Source services={this.props.services} changeState={this.changeState.bind(this)} />
-                <Export services={this.props.services}/>
+                <Source
+                    active={this.state.active}
+                    services={this.state.services}
+                    changeState={this.changeState.bind(this)
+                    }
+                />
+
+                <Export
+                    services={this.state.services}
+                    email={this.state.email}
+                    updateEmail={this.updateEmail.bind(this)}
+                />
+
                 <Link to={'/payment'}>
                     <button type="button" className="btn btn-primary btn-generate">Generate</button>
                 </Link>
+
             </div>
         );
 
@@ -44,7 +90,7 @@ export default class App extends Component {
                 <div className="panel-heading">
                     Generate Report
                 </div>
-                <Services services={this.props.services} removeAccount={this.changeState.bind(this)}/>
+                <Services services={this.state.services}/>
             </div>
         );
 
@@ -90,14 +136,6 @@ export default class App extends Component {
         );
 
     }
-
-    changeState(service){
-        this.setState({
-            services: service,
-        });
-    }
-
-
 
     handleEvent(){
 
@@ -150,17 +188,26 @@ export default class App extends Component {
         });
     }
 
+    changeState(service,pickedService){
+        this.setState({
+            services: service,
+            active: pickedService,
+        });
+    }
+
+    updateEmail(newEmail){
+        this.setState({
+            email: newEmail,
+        });
+    }
+
+
 }
 
-App.PropTypes = {
-    buys: PropTypes.array.isRequired,
-    sells: PropTypes.array.isRequired,
-    services: PropTypes.arrayOf(
-        PropTypes.shape({
-            accounts: PropTypes.array.isRequired,
-            type: PropTypes.string.isRequired,
-        })).isRequired,
-};
+
+
+
+export default AppContainer = createContainer(props => { return {}; }, App);
 
 
 

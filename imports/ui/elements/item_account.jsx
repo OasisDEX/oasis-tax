@@ -38,6 +38,8 @@ export default class Account extends Component {
     }
 
     deleteAccount(){
+        console.log("delete Account: ");
+        console.log( this.props.account);
         this.props.removeAccount(this.props.account);
     }
 
