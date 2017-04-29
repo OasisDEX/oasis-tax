@@ -1,4 +1,5 @@
-import React, {Component, PropTypes} from 'react';
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import Picker from '../lists/picker'
 import Services from "../lists/services";
 import InputGroup from "../elements/item_input";
@@ -91,6 +92,7 @@ export default class Source extends Component {
             let account = {
                 name: accountName,
                 provider: serviceName,
+                trades: [],
             };
             service[0].accounts.push(account);
             let la = this.props.services;

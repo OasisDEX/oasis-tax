@@ -1,4 +1,6 @@
-import React, {Component, PropTypes} from 'react';
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
+
 
 export default class Account extends Component {
 
@@ -38,8 +40,6 @@ export default class Account extends Component {
     }
 
     deleteAccount(){
-        console.log("delete Account: ");
-        console.log( this.props.account);
         this.props.removeAccount(this.props.account);
     }
 
