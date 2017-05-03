@@ -4,11 +4,9 @@ import Source from "./../components/source";
 import Export from './../components/export';
 
 import {Link} from 'react-router-dom';
+import { createContainer } from 'meteor/react-meteor-data';
 
-
-
-
-export default class ConfigurationPage extends Component {
+export class ConfigurationPage extends Component {
     render(){
        return (
            <div>
@@ -32,6 +30,16 @@ export default class ConfigurationPage extends Component {
 
     }
 }
+
+export default createContainer(({active, email, services, changeState, updateEmail}) => {
+    return {
+        active: active,
+        email: email,
+        services: services,
+        changeState: changeState,
+        updateEmail: updateEmail,
+    }
+}, ConfigurationPage);
 
 ConfigurationPage.PropTypes = {
     active: PropTypes.number.isRequired,

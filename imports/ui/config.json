@@ -66,5 +66,18 @@
       "0x6531f133e6deebe7f2dce5a0441aa7ef330b4e53": "TIME",
       "0xf7b098298f7c69fc14610bf71d5e02c60792894c": "GUP"
     }
-  }
+  },
+  "services": [
+
+    { "provider": "ethereum", "type": "address", "url": "oasisdex.com", "options" : [
+      { "active": true, "option": "Load data from Oasis (https://oasisdex.com)" },
+      { "active": false, "option": "Load data from Etherdelta (https://ether.delta)" }
+    ]},
+    { "provider": "steem", "type": "username", "url": "steemit.com", "options": [
+
+    ]},
+    { "provider": "bitshares", "type": "username", "url": "bitshares.org", "options": [
+      { "active": false, "option": "Alias IOU assets on Bitshares" }
+    ]}
+  ]
 }

@@ -2,10 +2,12 @@ import React, {Component}  from 'react';
 import Services from './../lists/services';
 import {Link} from 'react-router-dom';
 import PropTypes from 'prop-types';
+import config from './../config.json';
+import { createContainer } from 'meteor/react-meteor-data';
 
 
 
-export default class GenerateReportPage extends Component {
+export class GenerateReportPage extends Component {
     render(){
         return (
             <div>
@@ -32,66 +34,64 @@ export default class GenerateReportPage extends Component {
 
     }
 
-    getSimpleMarketContract(){
+    static getSimpleMarketContract(){
         let abi = [{"constant":false,"inputs":[{"name":"haveToken","type":"address"},{"name":"wantToken","type":"address"},{"name":"haveAmount","type":"uint128"},{"name":"wantAmount","type":"uint128"}],"name":"make","outputs":[{"name":"id","type":"bytes32"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"last_offer_id","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"id","type":"uint256"}],"name":"cancel","outputs":[{"name":"success","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"id","type":"uint256"}],"name":"getOffer","outputs":[{"name":"","type":"uint256"},{"name":"","type":"address"},{"name":"","type":"uint256"},{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"id","type":"bytes32"},{"name":"maxTakeAmount","type":"uint128"}],"name":"take","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"getTime","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"close_time","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"lifetime","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"id","type":"uint256"}],"name":"isActive","outputs":[{"name":"active","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"offers","outputs":[{"name":"sell_how_much","type":"uint256"},{"name":"sell_which_token","type":"address"},{"name":"buy_how_much","type":"uint256"},{"name":"buy_which_token","type":"address"},{"name":"owner","type":"address"},{"name":"active","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"id","type":"bytes32"}],"name":"kill","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"isClosed","outputs":[{"name":"closed","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"id","type":"uint256"}],"name":"getOwner","outputs":[{"name":"owner","type":"address"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"id","type":"uint256"},{"name":"quantity","type":"uint256"}],"name":"buy","outputs":[{"name":"success","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"sell_how_much","type":"uint256"},{"name":"sell_which_token","type":"address"},{"name":"buy_how_much","type":"uint256"},{"name":"buy_which_token","type":"address"}],"name":"offer","outputs":[{"name":"id","type":"uint256"}],"payable":false,"type":"function"},{"inputs":[{"name":"lifetime_","type":"uint256"}],"payable":false,"type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"id","type":"uint256"}],"name":"ItemUpdate","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"sell_how_much","type":"uint256"},{"indexed":true,"name":"sell_which_token","type":"address"},{"indexed":false,"name":"buy_how_much","type":"uint256"},{"indexed":true,"name":"buy_which_token","type":"address"}],"name":"Trade","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"id","type":"bytes32"},{"indexed":true,"name":"pair","type":"bytes32"},{"indexed":true,"name":"maker","type":"address"},{"indexed":false,"name":"haveToken","type":"address"},{"indexed":false,"name":"wantToken","type":"address"},{"indexed":false,"name":"haveAmount","type":"uint128"},{"indexed":false,"name":"wantAmount","type":"uint128"},{"indexed":false,"name":"timestamp","type":"uint64"}],"name":"LogMake","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"id","type":"bytes32"},{"indexed":true,"name":"pair","type":"bytes32"},{"indexed":true,"name":"maker","type":"address"},{"indexed":false,"name":"haveToken","type":"address"},{"indexed":false,"name":"wantToken","type":"address"},{"indexed":true,"name":"taker","type":"address"},{"indexed":false,"name":"takeAmount","type":"uint128"},{"indexed":false,"name":"giveAmount","type":"uint128"},{"indexed":false,"name":"timestamp","type":"uint64"}],"name":"LogTake","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"id","type":"bytes32"},{"indexed":true,"name":"pair","type":"bytes32"},{"indexed":true,"name":"maker","type":"address"},{"indexed":false,"name":"haveToken","type":"address"},{"indexed":false,"name":"wantToken","type":"address"},{"indexed":false,"name":"haveAmount","type":"uint128"},{"indexed":false,"name":"wantAmount","type":"uint128"},{"indexed":false,"name":"timestamp","type":"uint64"}],"name":"LogKill","type":"event"}];
         return web3.eth.contract(abi);
     }
 
     handleEvent(){
 
-        for(i = 0; i < this.state.services[0].accounts.length; i++){
+        let accounts = this.props.services[0].accounts;
 
-            let address = this.state.services[0].accounts[i].name;
+        for(var i = 0; i < accounts.length; i++){
 
-            let oasis = this.getSimpleMarketContract().at(config.market.kovan.address);
+            console.log("account top :" + i);
 
-            let allTakeEvents = oasis.LogTake({taker: address,}, {fromBlock: config.market.kovan.blockNumber, toBlock: 'latest'});
+            let account = accounts[i];
 
-            allTakeEvents.watch((error, result) => {});
+            let oasis = GenerateReportPage.getSimpleMarketContract().at(config.market.kovan.address);
+
+            let allTakeEvents = oasis.LogTake({taker: account.name,}, {fromBlock: config.market.kovan.blockNumber, toBlock: 'latest'});
+
+          //  allTakeEvents.watch((error, result) => {});
 
             allTakeEvents.get( (error, logs) => {
-
-                for(let i in logs){
-
-                    let timestamp = new Date(logs[i].args.timestamp * 1000).toLocaleString();
-
-                    giveAmount = logs[i].args.giveAmount;
-                    giveAmount = giveAmount.toString(10);
-                    giveAmount = web3.fromWei(giveAmount);
-
-                    takeAmount = logs[i].args.takeAmount;
-                    takeAmount = takeAmount.toString(10);
-                    takeAmount = web3.fromWei(takeAmount);
-
-                    let trade = {
-                        'Type'     : 'Trade',
-                        'Buy'      : giveAmount,
-                        'Buy_Cur.' : config.tokens.kovan[logs[i].args.wantToken],
-                        'Sell'     : takeAmount,
-                        'Sell_Cur.': config.tokens.kovan[logs[i].args.haveToken],
-                        'Fee'      : '',
-                        'Fee_Cur.' : '',
-                        'Exchange' : '',
-                        'Group'    : '',
-                        'Comment'  : address,
-                        'Date'     : timestamp,
-                    };
-
-
-                    this.setState( (state) =>
-                        update(state, {trades: {$push: [trade]}}));
-
-                    //    this.state.services[0].accounts[i].trades.push(trade);
-
-
+                for(let index in logs){
+                    this.addTrade(account, logs[index] );
                 }
-
-                //     console.log(this.state.services);
-                console.log(this.state.trades);
-
-
             });
         }
+
+    }
+
+    addTrade(account, log){
+        let timestamp = new Date(log.args.timestamp * 1000).toLocaleString();
+
+        giveAmount = log.args.giveAmount;
+        giveAmount = giveAmount.toString(10);
+        giveAmount = web3.fromWei(giveAmount);
+
+        takeAmount = log.args.takeAmount;
+        takeAmount = takeAmount.toString(10);
+        takeAmount = web3.fromWei(takeAmount);
+
+        let trade = {
+            'Type'     : 'Trade',
+            'Buy'      : giveAmount,
+            'Buy_Cur.' : config.tokens.kovan[log.args.wantToken],
+            'Sell'     : takeAmount,
+            'Sell_Cur.': config.tokens.kovan[log.args.haveToken],
+            'Fee'      : '',
+            'Fee_Cur.' : '',
+            'Exchange' : '',
+            'Group'    : '',
+            'Comment'  : account.name,
+            'Date'     : timestamp,
+        };
+
+        account.trades.push(trade);
+        let newService = this.props.services;
+        this.props.addAccount(newService);
 
     }
 
@@ -170,6 +170,12 @@ export default class GenerateReportPage extends Component {
     }
 }
 
+export default createContainer(({services}) => {
+    return {
+        services: services,
+    }
+}, GenerateReportPage);
+
 GenerateReportPage.PropTypes = {
     services: PropTypes.arrayOf(
         PropTypes.shape({
@@ -185,4 +191,5 @@ GenerateReportPage.PropTypes = {
                 })
             ).isRequired
         })).isRequired,
+    addAccount: PropTypes.func.isRequired,
 };

@@ -3,8 +3,9 @@ import {BrowserRouter as Router, Link, Route} from 'react-router-dom';
 import createBrowserHistory from 'history/createBrowserHistory';
 import Web3 from 'web3';
 import { createContainer } from 'meteor/react-meteor-data';
-import ConfigurationPageContainer from './pages/ConfigurationPageContainer';
-import GenerateReportPageContainer from './pages/GenerateReportPageContainer';
+import ConfigurationPage from './pages/ConfigurationPage';
+import GenerateReportPage from './pages/GenerateReportPage';
+import config from './config.json';
 
 const history = createBrowserHistory();
 
@@ -25,40 +26,10 @@ export class App extends Component {
         this.state = {
             active: 0,
             trades: [],
-            services: [
-                {
-                    id: 0,
-                    accounts: [],
-                    provider: 'ethereum',
-                    type: 'address',
-                    url: 'oasisdex.com',
-                    options: [
-                        { active: true, option: 'Load data from Oasis (https://oasisdex.com)'},
-                        { active: false, option: 'Load data from Etherdelta (https://ether.delta)'},
-                             ]
-                },
-                {
-                    id: 1,
-                    accounts: [],
-                    provider: 'steem',
-                    type: 'username',
-                    url: 'steemit.com',
-                    options: []
-                },
-                {
-                    id: 2,
-                    accounts: [],
-                    provider: 'bitshares',
-                    type: 'username',
-                    url: 'bitshares.org',
-                    options: [
-                        { active: false, option: 'Alias IOU assets on Bitshares'},
-                ]},
-            ],
+            services: this.getServicesFromConfigFile(),
             email: '',
         };
     }
-
     render() {
         return (
             <Router history={history}>
@@ -77,7 +48,7 @@ export class App extends Component {
                     <Route
                         exact path="/"
                         render={() =>
-                            (<ConfigurationPageContainer
+                            (<ConfigurationPage
                                 active={this.state.active}
                                 email={this.state.email}
                                 services={this.state.services}
@@ -88,8 +59,9 @@ export class App extends Component {
                     <Route
                         path="/payment"
                         render={() =>(
-                            <GenerateReportPageContainer
+                            <GenerateReportPage
                                 services={this.state.services}
+                                addAccount={this.addAccount.bind(this)}
                             />
                         )}/>
                 </div>
@@ -100,10 +72,37 @@ export class App extends Component {
 
     }
 
+
+    getServicesFromConfigFile(){
+
+        var jsonArr = [];
+
+        let servicesArr = config.services;
+
+        for (let i = 0; i < config.services.length; i++) {
+            jsonArr.push({
+                id: i,
+                accounts: [],
+                provider: servicesArr[i].provider,
+                type: servicesArr[i].type,
+                url: servicesArr[i].url,
+                options: servicesArr[i].options
+            });
+        }
+        return jsonArr
+    }
+
     changeState(service,pickedService){
         this.setState({
             services: service,
             active: pickedService,
+        });
+    }
+
+    addAccount(services){
+        console.log(services);
+        this.setState({
+            services: services,
         });
     }
 
@@ -116,4 +115,4 @@ export class App extends Component {
 
 }
 
-export default AppContainer = createContainer(props => { return {}; }, App);
+export default AppContainer = createContainer(() => { return {}; }, App);
