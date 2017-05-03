@@ -6,6 +6,8 @@
   },
   "dependencies": {
     "babel-runtime": "^6.20.0",
+    "bn.js": "^4.11.6",
+    "ethereumjs-util": "^5.1.1",
     "history": "^4.6.1",
     "immutability-helper": "^2.1.2",
     "meteor-node-stubs": "~0.2.4",
