@@ -4,7 +4,9 @@ import {Link} from 'react-router-dom';
 import PropTypes from 'prop-types';
 import config from './../config.json';
 import { createContainer } from 'meteor/react-meteor-data';
-
+import { HTTP } from 'meteor/http'
+import BN from 'bn.js';
+import EthUtils from 'ethereumjs-util';
 
 
 export class GenerateReportPage extends Component {
@@ -24,7 +26,7 @@ export class GenerateReportPage extends Component {
                     </div>
                 </div>
 
-                <button type="button" onClick={this.handleEvent.bind(this)} className="btn btn-primary btn-generate">Download</button>
+                <button type="button" onClick={this.fetchTrades.bind(this)} className="btn btn-primary btn-generate">Download</button>
                 <Link to={'/'}>
                     <button type="button" className="btn btn-primary btn-back">Back</button>
                 </Link>
@@ -39,28 +41,78 @@ export class GenerateReportPage extends Component {
         return web3.eth.contract(abi);
     }
 
-    handleEvent(){
+    fetchTrades(){
 
         let accounts = this.props.services[0].accounts;
 
-        for(var i = 0; i < accounts.length; i++){
+        for(let i = 0; i < accounts.length; i++) {
+            this.searchLegacyMarkets(accounts[i]);
+            this.searchEventfulMarkets(accounts[i]);
+        }
 
-            console.log("account top :" + i);
+    }
 
-            let account = accounts[i];
+    searchEventfulMarkets(account){
+        let oasis = GenerateReportPage.getSimpleMarketContract().at(config.market.live.address);
 
-            let oasis = GenerateReportPage.getSimpleMarketContract().at(config.market.kovan.address);
+        let allTakeEvents = oasis.LogTake({taker: account.name,}, {fromBlock: config.market.live.blockNumber, toBlock: 'latest'});
 
-            let allTakeEvents = oasis.LogTake({taker: account.name,}, {fromBlock: config.market.kovan.blockNumber, toBlock: 'latest'});
+        //  allTakeEvents.watch((error, result) => {});
 
-          //  allTakeEvents.watch((error, result) => {});
+        allTakeEvents.get( (error, logs) => {
+            for(let index in logs){
+                this.addTrade(account, logs[index] );
+            }
+        });
 
-            allTakeEvents.get( (error, logs) => {
-                for(let index in logs){
-                    this.addTrade(account, logs[index] );
+    }
+
+    searchLegacyMarkets(account){
+
+        for (let j = 2; j < 15; j++) {
+            HTTP.get(Meteor.absoluteUrl("/maker-otc-" + j + ".trades.json"), (err, result) => {
+                let data = result.data;
+                for (let i = 0; i < data.length; i++) {
+                    const maker = EthUtils.addHexPrefix(data[i].maker);
+                    if ( maker ===  account.name || data[i].taker === account.name) {
+                        console.log(data[i]);
+                        this.addTradeFromLegacyMarkets(account, data[i]);
+                    }
                 }
+
             });
         }
+    }
+
+    addTradeFromLegacyMarkets(account, log){
+        let timestamp = new Date(log.timestamp * 1000).toLocaleString();
+
+
+
+        giveAmount = web3.fromWei(new BN(log.giveAmount, 16).toString(10));
+        takeAmount = web3.fromWei(new BN(log.takeAmount, 16).toString(10));
+
+        const wantToken = config.tokens.live[EthUtils.addHexPrefix(log.wantToken)];
+        const haveToken = config.tokens.live[EthUtils.addHexPrefix(log.haveToken)];
+
+
+        let trade = {
+            'Type'     : 'Trade',
+            'Buy'      : giveAmount,
+            'Buy_Cur.' : wantToken,
+            'Sell'     : takeAmount,
+            'Sell_Cur.': haveToken,
+            'Fee'      : '',
+            'Fee_Cur.' : '',
+            'Exchange' : '',
+            'Group'    : '',
+            'Comment'  : account.name,
+            'Date'     : timestamp,
+        };
+
+        account.trades.push(trade);
+        let newService = this.props.services;
+        this.props.addAccount(newService);
 
     }
 
@@ -78,9 +130,9 @@ export class GenerateReportPage extends Component {
         let trade = {
             'Type'     : 'Trade',
             'Buy'      : giveAmount,
-            'Buy_Cur.' : config.tokens.kovan[log.args.wantToken],
+            'Buy_Cur.' : config.tokens.live[log.args.wantToken],
             'Sell'     : takeAmount,
-            'Sell_Cur.': config.tokens.kovan[log.args.haveToken],
+            'Sell_Cur.': config.tokens.live[log.args.haveToken],
             'Fee'      : '',
             'Fee_Cur.' : '',
             'Exchange' : '',
