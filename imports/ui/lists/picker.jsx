@@ -1,60 +1,76 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
-Sources = [
-    { id: 0, name: 'ethereum', type: 'address', url: 'oasisdex.com' },
-    { id: 1, name: 'steem', type: 'username', url: 'steemit.com' },
-    { id: 2, name: 'bitshares', type: 'username', url: 'bitshares.org' },
-];
+
+
 export default class Picker extends Component {
 
     constructor(props){
         super(props);
         this.state = {
-            sources: Sources,
-            selectedOption: 0,
-
+            selectedOption: props.active,
         };
     }
 
     render() {
         return (
-
             <ul className="list-group picker-container">
                 <form>
-
-            { this.state.sources.map((source) => (
-                <li className="list-group-item" key={source.id}>
-                <div className="radio">
-                    <label>
-                        <input
-                            type="radio"
-                            value={source.id}
-                            checked={this.state.selectedOption == source.id }
-                            onChange={this.handleOptionChange.bind(this)}
-                        />
-                        <span className="picker-label">{source.name}</span>
-                    </label>
-                </div>
-                </li>
-            ))}
+                    {this.renderElements()}
                 </form>
             </ul>
         );
     }
 
+    renderElements(){
+        return this.props.services.map((service) => (this.renderElement(service)));
+    }
+
+    renderElement(service){
+        return(
+            <li className="list-group-item" key={service.id}>
+            <div className="radio">
+                <label>
+                    <input
+                        type="radio"
+                        value={service.id}
+                        name="myGroupName"
+                        checked={this.state.selectedOption == service.id}
+                        onChange={this.handleOptionChange.bind(this)}
+                    />
+                    <span className="picker-label">{service.provider}</span>
+                </label>
+            </div>
+        </li>
+        );
+    }
+
     handleOptionChange(event){
-        console.log(event.target.value);
+
         this.setState({
-            selectedOption: event.target.value
+            selectedOption:  event.target.value
         });
-        service = this.state.sources[event.target.value];
-        this.props.changePlaceHolderText(service);
+        this.props.changePlaceHolderText(event.target.value);
     }
 
 }
 
 Picker.PropTypes = {
-    defaultService: PropTypes.string.isRequired,
+    active: PropTypes.number.isRequired,
+    services: PropTypes.arrayOf(
+        PropTypes.shape({
+            id: PropTypes.number.isRequired,
+            accounts: PropTypes.array.isRequired,
+            provider: PropTypes.string.isRequired,
+            type: PropTypes.string.isRequired,
+            url: PropTypes.string.isRequired,
+            options: PropTypes.arrayOf(
+                PropTypes.shape({
+                    active: PropTypes.bool.isRequired,
+                    option: PropTypes.string.isRequired,
+                })
+            ).isRequired
+        })).isRequired,
     changePlaceHolderText: PropTypes.func.isRequired,
 
 };

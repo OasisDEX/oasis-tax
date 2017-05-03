@@ -1,5 +1,5 @@
-import React, {Component, PropTypes} from 'react';
-
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 
 
@@ -35,11 +35,11 @@ export default class InputGroup extends Component {
         event.preventDefault();
 
         // Find the text field via the React ref
-        const accountName = ReactDOM.findDOMNode(this.textInput).value.trim();
+        const inputValue = ReactDOM.findDOMNode(this.textInput).value.trim();
         ReactDOM.findDOMNode(this.textInput).value = '';
 
-        if(accountName !== ''){
-        this.props.handleSubmit(accountName);
+        if(inputValue.length > 0 ){
+        this.props.handleSubmit(inputValue);
         }
     }
 
