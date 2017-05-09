@@ -1,0 +1,17 @@
+server:
+      node:        "ws://127.0.0.1:7070"
+      wallet:      "127.0.0.1"
+      wallet_port:  8091
+      wallet_user: ""
+      wallet_pass: ""
+
+ops:
+   include: "['fill_vesting_withdraw', 'curation_reward', 'author_reward', 'interest', 'fill_order', 'pow']"
+
+   exclude: "['withdraw_vesting', 'transfer', 'transfer_to_vesting', 'vote','comment','account_witness_vote','feed_publish','witness_update','account_update','account_witness_proxy','custom_json','limit_order_create']"
+
+exchange:
+   id:   5
+   name: "Steem Internal Market"
+  
+
