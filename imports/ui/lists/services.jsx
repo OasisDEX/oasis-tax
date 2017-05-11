@@ -30,6 +30,7 @@ export default class Services extends Component {
                      removeAccount={this.props.removeAccount}
                      key={index}
                      providerIsVisible={ index === 0}
+                     isLoading={this.props.isLoading}
             />
         );
     }
@@ -50,5 +51,6 @@ Services.propTypes = {
                 })
             ).isRequired
         })).isRequired,
+    isLoading: PropTypes.bool,
     removeAccount: PropTypes.func,
 };

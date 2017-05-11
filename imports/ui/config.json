@@ -13,6 +13,17 @@
       "blockNumber": 3435757
     }
   },
+  "baseCurrency": {
+    "kovan": {
+      "ETH": "0x53eccc9246c1e537d79199d0c7231e425a40f896"
+    },
+    "ropsten": {
+      "ETH": "0xece9fa304cc965b00afc186f5d0281a00d3dbbfd"
+    },
+    "live": {
+      "ETH": "0xecf8f87f810ecf450940c9f60066b4a7a501d6a7"
+    }
+  },
   "tokens": {
     "kovan": {
       "0x53eccc9246c1e537d79199d0c7231e425a40f896": "ETH",
@@ -79,5 +90,9 @@
     { "provider": "bitshares", "type": "username", "url": "bitshares.org", "options": [
       { "active": false, "option": "Alias IOU assets on Bitshares" }
     ]}
-  ]
+  ],
+  "csv": {
+    "title": "TaxReport",
+    "header": ["Type","Buy","Cur.","Sell","Cur.","Fee","Cur.", "Exchange","Comment","Date"]
+  }
 }

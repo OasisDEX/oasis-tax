@@ -23,7 +23,7 @@ export class ConfigurationPage extends Component {
                />
 
                <Link to={'/payment'}>
-                   <button type="button" className="btn btn-primary btn-generate">Generate</button>
+                   <button type="button" className="btn btn-primary btn-generate">Next</button>
                </Link>
            </div>
        );
