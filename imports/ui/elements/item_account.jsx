@@ -6,6 +6,9 @@ export default class Account extends Component {
 
 
     render(){
+
+        isRemovable = true
+
           return(
               <li className="list-group-item">
                 <div className="row">
@@ -13,21 +16,14 @@ export default class Account extends Component {
                         <span className="account-item-service">{this.checkVisibility()}</span>
                 </div>
                 <div className="col-xs-12 col-md-10 npl">
-                <div className="col-xs-11 col-md-11">
+                <div className="col-xs-11 col-md-10">
                                                 <span
                                                     className="account-item-name"
                                                     ref={(accountName) => this.accountName = accountName}
                                                 >{this.props.account.name}
-                                             </span>
+                                                </span>
             </div>
-            <div className="col-xs-1 col-md-1">
-                <button
-                    className="delete"
-                    onClick={this.deleteAccount.bind(this)}
-                >
-                    &times;
-                </button>
-            </div>
+                {this.isRemovable()}
         </div>
     </div>
 </li>);
@@ -43,10 +39,39 @@ export default class Account extends Component {
         this.props.removeAccount(this.props.account);
     }
 
+    isRemovable(){
+        if(this.props.removeAccount === undefined){
+            return (
+                <div className="col-xs-1 col-md-1">
+                {this.isLoading()}
+                </div>);
+        }else {
+            return (
+            <div className="col-xs-1 col-md-1">
+                <button
+                    className="delete"
+                    onClick={this.deleteAccount.bind(this)}
+                >
+                    &times;
+                </button>
+            </div>
+               );
+        }
+    }
+
+    isLoading(){
+        if(this.props.isLoading){
+            return (<img src="ic_loading_24px.svg"></img>);
+        }else {
+            return (<img src="ic_done_24px.svg"></img>);
+        }
+    }
+
 }
 
 Account.PropTypes = {
     account: PropTypes.object.isRequired,
-    removeAccount: PropTypes.func.isRequired,
+    removeAccount: PropTypes.func,
     providerIsVisible: PropTypes.bool.isRequired,
+    isLoading: PropTypes.bool,
 };

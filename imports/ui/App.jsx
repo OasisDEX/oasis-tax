@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import {BrowserRouter as Router, Link, Route} from 'react-router-dom';
 import createBrowserHistory from 'history/createBrowserHistory';
-import Web3 from 'web3';
 import { createContainer } from 'meteor/react-meteor-data';
 import ConfigurationPage from './pages/ConfigurationPage';
 import GenerateReportPage from './pages/GenerateReportPage';
@@ -15,17 +14,8 @@ export class App extends Component {
     constructor(props){
         super(props);
 
-        if (typeof web3 !== 'undefined') {
-            web3 = new Web3(web3.currentProvider);
-        } else {
-            // set the provider you want from Web3.providers
-            web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
-            console.log("new");
-        }
-
         this.state = {
             active: 0,
-            trades: [],
             services: this.getServicesFromConfigFile(),
             email: '',
         };
