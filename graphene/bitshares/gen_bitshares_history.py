@@ -33,7 +33,7 @@ class Config():
  wallet_pass    = wallet_pass
  witness_url    = node
 
-accounts = ['nikolai']
+accounts = ['nikolai'] #This needs to be an input parameter
 bitshares = BitShares()
 blockchain = Blockchain()
 
@@ -41,7 +41,11 @@ def get_time_of_block(block_num):
   return(blockchain.block_time(block_num))
 
 def lookup_asset(asset_id):
-  #print(asset(asset_id))
+
+  # This will get replaced with a proper on chain lookup once API
+  # issues are resolved. In the mean time a case structure will
+  # have to do.
+
   if asset_id == "1.3.0":
     return("BTS")
   if asset_id == "1.3.757":
@@ -122,9 +126,11 @@ for acc in accounts:
 
 
         if op_code == 4: #Trade
+
            #[4, {'account_id': '1.2.228', 'pays': {'amount': 504000, 'asset_id': '1.3.539'}, 
            #                              'receives': {'amount': 403200000, 'asset_id': '1.3.0'}, 'order_id': '1.7.72543', 'fee': {'amount': 0, 'asset_id': '1.3.0'}}]
            #print (record)
+
            buy       = int(op['receives']['amount'])
            sell      = int(op['pays']['amount'])
            buy_cur   = lookup_asset(op['receives']['asset_id'])
@@ -134,8 +140,10 @@ for acc in accounts:
            continue
 
         if op_code == 37: #Divest
+
            #[37, {'deposit_to_account': '1.2.228', 'fee': {'amount': 0, 'asset_id': '1.3.0'}, 'total_claimed': {'amount': 102242168, 'asset_id': '1.3.0'}, 
            #                                       'balance_to_claim': '1.15.69094', 'balance_owner_key': 'BTS8bQ8zznmFi9NRuS4d7xWpG4RnDFvPHhGKpmReC47mGpnzrmJY6'}]
+
           from_act    = acc
           to_act      = acc
           amount      = float(op['total_claimed']['amount'])
@@ -148,8 +156,10 @@ for acc in accounts:
           continue
 
         if op_code == 3: #Adjust Short
+
            #[37, {'deposit_to_account': '1.2.228', 'fee': {'amount': 0, 'asset_id': '1.3.0'}, 'total_claimed': {'amount': 102242168, 'asset_id': '1.3.0'}, 
            #                                       'balance_to_claim': '1.15.69094', 'balance_owner_key': 'BTS8bQ8zznmFi9NRuS4d7xWpG4RnDFvPHhGKpmReC47mGpnzrmJY6'}]
+
           from_act    = acc
           to_act      = acc
           amount      = float(op['total_claimed']['amount'])
