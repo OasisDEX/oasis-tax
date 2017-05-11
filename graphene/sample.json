@@ -1,13 +1,13 @@
 {
 "Type":"Trade",
-"Buy": giveAmount,
-"Buy_Cur.": STEEM,
+"Buy": "giveAmount",
+"Buy_Cur.": "STEEM",
 "Sell":takeAmount,
-"Sell_Cur.":SBD],
+"Sell_Cur.":"SBD",
 "Fee":"0",
 "Fee_Cur.":"",
 "Exchange": exchanges[0],
 "Group": "",
 "Comment":"",
 "Date":timestamp,
-},
+}

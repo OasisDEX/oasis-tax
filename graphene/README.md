@@ -1,1 +1,1 @@
-Transaction dumps for Steem and Bitshares blockchains
+Transaction dumps for Steem, Bitshares, and other Graphene based blockchains.
