@@ -107,12 +107,65 @@ export class GenerateReportPage extends Component {
             return Promise.all(this.fetchAllTimeStampsFromEtherdelta(data));
         }).then( (data) => {
 
-            console.log(data);
+            this.addEtherDeltaTrades(data)
             this.setState({
                 isLoading: false,
                 hasPayed: true,
             });
         });
+    }
+
+    addEtherDeltaTrades(data){
+        for(let i=0; i < data.length; i++){
+
+            let giveAmount;
+            let takeAmount;
+            let haveTokenAddress;
+            let wantTokenAddress;
+            let timestamp;
+            let wantToken;
+            let haveToken;
+
+            giveAmount = web3.fromWei(data[i].log.args.amountGive.toString(10));
+            takeAmount = web3.fromWei(data[i].log.args.amountGet.toString(10));
+
+            haveTokenAddress = data[i].log.args.tokenGive;
+            wantTokenAddress = data[i].log.args.tokenGet;
+
+            timestamp = new Date(data[i].timestamp * 1000).toLocaleString();
+
+            wantToken = config.etherdelta.tokens[wantTokenAddress];
+            haveToken = config.etherdelta.tokens[haveTokenAddress];
+
+            if(typeof wantToken === 'undefined'){
+                wantToken = wantTokenAddress;
+            }
+
+            if(typeof haveToken === 'undefined'){
+                haveToken = haveTokenAddress;
+            }
+
+
+            let trade = {
+                'Type'     : 'Trade',
+                'Buy'      : giveAmount,
+                'Buy_Cur' : wantToken,
+                'Sell'     : takeAmount,
+                'Sell_Cur': haveToken,
+                'Fee'      : '',
+                'Fee_Cur' : '',
+                'Exchange' : 'Etherdelta.github.io',
+                'Group'    : '',
+                'Comment'  : data[i].account.name,
+                'Date'     : timestamp,
+            };
+
+            //add trade to CSV
+            this.JSONToCSVConverter(trade);
+            data[i].account.trades.push(trade);
+        }
+        let newService = this.props.services;
+        this.props.addAccount(newService);
     }
 
 
@@ -138,7 +191,7 @@ export class GenerateReportPage extends Component {
 
    // address tokenGet, uint amountGet, address tokenGive, uint amountGive, address get, address give
 
-    fetchEtherdeltaTradesFromAllContracts(address, promises){
+    fetchEtherdeltaTradesFromAllContracts(account, promises){
 
         const allContracts = config.etherdelta.contract.live;
 
@@ -154,15 +207,13 @@ export class GenerateReportPage extends Component {
                     if (!error) {
                         let trades = [];
                         for(let i = 0; i < logs.length; i++){
-                            if(logs[i].args.get === address.name || logs[i].args.give === address.name){
+                            if(logs[i].args.get === account.name || logs[i].args.give === account.name){
                                 let trade =  {
-                                    addr: address.name,
+                                    acc: account,
                                     log: logs[i],
                                     };
 
                                 trades.push(trade);
-                             //   console.log(logs[i]);
-                        //        this.addTrade(address, logs[i], tradeTypes.DELTA)
                             }
                         }
                         resolve(trades);
@@ -185,8 +236,14 @@ export class GenerateReportPage extends Component {
                     web3.eth.getBlock(data[i][j].log.blockNumber, function(error, result){
                         if(!error){
                             console.log(result);
-                            data[i][j].timeStamp = result.timestamp;
-                            resolve(data);
+                            let trade = {
+                                account: data[i][j].acc,
+                                log: data[i][j].log,
+                                timestamp: result.timestamp
+                            };
+                            trades.push(trade);
+                       //     data[i][j].timeStamp = result.timestamp;
+                            resolve(trade);
                         }else{
                             console.error(error);
                             reject();
