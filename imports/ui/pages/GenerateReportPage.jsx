@@ -14,7 +14,7 @@ import Web3 from 'web3';
 const tradeTypes = {
     DELTA : "etherdelta",
     OASIS : "oasis_event",
-    OASIS_LEGACY : "oasis_event"
+    OASIS_LEGACY : "oasis_legacy"
 };
 
 export class GenerateReportPage extends Component {
@@ -23,7 +23,7 @@ export class GenerateReportPage extends Component {
         super(props);
         this.state = {
             csv : this.initCSVHeader(),
-            oasis: GenerateReportPage.getSimpleMarketContract().at(config.oasis.contract.kovan.address),
+            oasis: GenerateReportPage.getSimpleMarketContract().at(config.oasis.contract.live.address),
             hasPayed: false,
             isLoading: false,
 
@@ -91,18 +91,23 @@ export class GenerateReportPage extends Component {
             isLoading: true,
         });
 
-        let promises = [];
+        let deltaPromises = [];
+        let oasisPromises = [];
 
         let accounts = this.props.services[0].accounts;
 
         for(let i = 0; i < accounts.length; i++) {
 
-            this.fetchEtherdeltaTradesFromAllContracts(accounts[i],promises);
-    //        const fetchOasisAcceptedTrades = this.fetchAcceptedTrades(accounts[i]);
-    //        const fetchOasisLegacyTrades = this.fetchLegacyTrades(accounts[i]);
+            this.fetchEtherdeltaTradesFromAllContracts(accounts[i],deltaPromises);
+      //      oasisPromises.push(this.fetchLegacyTrades(accounts[i]));
+              oasisPromises.push(this.fetchAcceptedTrades(accounts[i]));
+              oasisPromises.push(this.fetchIssuedTradesFor(accounts[i]));
 
         }
-        Promise.all(promises).then( ( data ) => {
+        Promise.all(oasisPromises).then( () => {
+            console.log("oasis stuff checked");
+            return Promise.all(deltaPromises);
+        }).then( ( data ) => {
             console.log(data);
             return Promise.all(this.fetchAllTimeStampsFromEtherdelta(data));
         }).then( (data) => {
@@ -120,8 +125,8 @@ export class GenerateReportPage extends Component {
 
             let giveAmount;
             let takeAmount;
-            let haveTokenAddress;
-            let wantTokenAddress;
+            let haveTokenAddress = data[i].log.args.tokenGive;
+            let wantTokenAddress = data[i].log.args.tokenGet;
             let timestamp;
             let wantToken;
             let haveToken;
@@ -129,21 +134,30 @@ export class GenerateReportPage extends Component {
             giveAmount = web3.fromWei(data[i].log.args.amountGive.toString(10));
             takeAmount = web3.fromWei(data[i].log.args.amountGet.toString(10));
 
-            haveTokenAddress = data[i].log.args.tokenGive;
-            wantTokenAddress = data[i].log.args.tokenGet;
-
             timestamp = new Date(data[i].timestamp * 1000).toLocaleString();
 
-            wantToken = config.etherdelta.tokens[wantTokenAddress];
-            haveToken = config.etherdelta.tokens[haveTokenAddress];
+            const baseCurrency = config.etherdelta.baseCurrency;
+
+
+
+            if (wantTokenAddress === baseCurrency) {
+                console.log('bid');
+                wantToken = config.etherdelta.tokens[haveTokenAddress];
+                haveToken = config.etherdelta.tokens[wantTokenAddress];
+            } else if (haveTokenAddress === baseCurrency) {
+                console.log('ask');
+                wantToken = config.etherdelta.tokens[wantTokenAddress];
+                haveToken = config.etherdelta.tokens[haveTokenAddress];
+            }
+
 
             if(typeof wantToken === 'undefined'){
-                wantToken = wantTokenAddress;
+                wantToken = data[i].log.args.tokenGet
+            }
+            if(typeof haveToken === 'undefined'){
+                haveToken = data[i].log.args.tokenGive;
             }
 
-            if(typeof haveToken === 'undefined'){
-                haveToken = haveTokenAddress;
-            }
 
 
             let trade = {
@@ -160,6 +174,8 @@ export class GenerateReportPage extends Component {
                 'Date'     : timestamp,
             };
 
+            console.log(trade);
+
             //add trade to CSV
             this.JSONToCSVConverter(trade);
             data[i].account.trades.push(trade);
@@ -167,8 +183,6 @@ export class GenerateReportPage extends Component {
         let newService = this.props.services;
         this.props.addAccount(newService);
     }
-
-
 
     fetchLegacyTrades(address){
         return new Promise( (resolve, reject) => {
@@ -260,7 +274,7 @@ export class GenerateReportPage extends Component {
     fetchAcceptedTrades(address){
         return new Promise((resolve, reject) => {
             this.state.oasis.LogTake({maker: address.name}, {
-                fromBlock: config.oasis.contract.kovan.blockNumber,
+                fromBlock: config.oasis.contract.live.blockNumber,
                 toBlock: 'latest'}).get( (error, makeLogs) => {
                 if(!error){
                     for(let i=0;i < makeLogs.length; i++){
@@ -279,7 +293,7 @@ export class GenerateReportPage extends Component {
     fetchIssuedTradesFor(address) {
         return new Promise((resolve, reject) => {
             this.state.oasis.LogTake({taker: address.name}, {
-                fromBlock: config.oasis.contract.kovan.blockNumber,
+                fromBlock: config.oasis.contract.live.blockNumber,
                 toBlock: 'latest'}).get( (error, takeLogs) => {
                 if(!error){
                     for(let i = 0; i < takeLogs.length; i++){
@@ -308,34 +322,29 @@ export class GenerateReportPage extends Component {
             case tradeTypes.OASIS_LEGACY :
                 giveAmount = web3.fromWei(new BN(log.giveAmount, 16).toString(10));
                 takeAmount = web3.fromWei(new BN(log.takeAmount, 16).toString(10));
-
-                haveTokenAddress = EthUtils.addHexPrefix(log.giveAmount);
-                wantTokenAddress = EthUtils.addHexPrefix(log.takeAmount);
-
+                haveTokenAddress = EthUtils.addHexPrefix(log.haveToken);
+                wantTokenAddress = EthUtils.addHexPrefix(log.wantToken);
                 timestamp = new Date(log.timestamp * 1000).toLocaleString();
-                wantToken = config.oasis.tokens.live[wantTokenAddress];
-                haveToken = config.oasis.tokens.live[haveTokenAddress];
                 break;
             case tradeTypes.OASIS:
                 giveAmount = web3.fromWei(log.giveAmount.toString(10));
                 takeAmount = web3.fromWei(log.takeAmount.toString(10));
-
                 haveTokenAddress = log.haveToken;
                 wantTokenAddress = log.wantToken;
-                wantToken = config.oasis.tokens.live[wantTokenAddress];
-                haveToken = config.oasis.tokens.live[haveTokenAddress];
-
                 timestamp = new Date(log.timestamp * 1000).toLocaleString();
                 break;
-            case tradeTypes.DELTA:
-                giveAmount = web3.fromWei(log.amountGive.toString(10));
-                takeAmount = web3.fromWei(log.amountGet.toString(10));
+        }
 
-                haveTokenAddress = log.tokenGive;
-                wantTokenAddress = log.tokenGet;
+        const baseCurrency = config.oasis.baseCurrency;
 
-                break;
 
+        if (wantTokenAddress === baseCurrency) {
+            wantToken = config.oasis.tokens.live[haveTokenAddress];
+            haveToken = config.oasis.tokens.live[wantTokenAddress];
+
+        } else if (haveTokenAddress === baseCurrency) {
+            wantToken = config.oasis.tokens.live[wantTokenAddress];
+            haveToken = config.oasis.tokens.live[haveTokenAddress];
         }
 
         let trade = {
@@ -346,7 +355,7 @@ export class GenerateReportPage extends Component {
             'Sell_Cur': haveToken,
             'Fee'      : '',
             'Fee_Cur' : '',
-            'Exchange' : '',
+            'Exchange' : 'Oasisdex.com',
             'Group'    : '',
             'Comment'  : account.name,
             'Date'     : timestamp,
