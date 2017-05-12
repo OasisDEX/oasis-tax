@@ -3,6 +3,8 @@ import Services from './../lists/services';
 import {Link} from 'react-router-dom';
 import PropTypes from 'prop-types';
 import config from './../config.json';
+import oasisABI from './../abi_oasis.json';
+import etherdeltaABI from './../abi_etherdelta.json';
 import { createContainer } from 'meteor/react-meteor-data';
 import { HTTP } from 'meteor/http'
 import BN from 'bn.js';
@@ -15,7 +17,7 @@ export class GenerateReportPage extends Component {
         super(props);
         this.state = {
             csv : this.initCSVHeader(),
-            oasis: GenerateReportPage.getSimpleMarketContract().at(config.market.live.address),
+            oasis: GenerateReportPage.getSimpleMarketContract().at(config.oasis.contract.kovan.address),
             hasPayed: false,
             isLoading: false,
 
@@ -65,7 +67,7 @@ export class GenerateReportPage extends Component {
             return (
                 <button
                     type="button"
-                    onClick={this.fetchTrades.bind(this)}
+                    onClick={this.fetch.bind(this)}
                     className="btn btn-primary btn-download">Generate
                 </button>);
         }
@@ -74,11 +76,10 @@ export class GenerateReportPage extends Component {
 
 
     static getSimpleMarketContract(){
-        let abi = [{"constant":false,"inputs":[{"name":"haveToken","type":"address"},{"name":"wantToken","type":"address"},{"name":"haveAmount","type":"uint128"},{"name":"wantAmount","type":"uint128"}],"name":"make","outputs":[{"name":"id","type":"bytes32"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"last_offer_id","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"id","type":"uint256"}],"name":"cancel","outputs":[{"name":"success","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"id","type":"uint256"}],"name":"getOffer","outputs":[{"name":"","type":"uint256"},{"name":"","type":"address"},{"name":"","type":"uint256"},{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"id","type":"bytes32"},{"name":"maxTakeAmount","type":"uint128"}],"name":"take","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"getTime","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"close_time","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"lifetime","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"id","type":"uint256"}],"name":"isActive","outputs":[{"name":"active","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"offers","outputs":[{"name":"sell_how_much","type":"uint256"},{"name":"sell_which_token","type":"address"},{"name":"buy_how_much","type":"uint256"},{"name":"buy_which_token","type":"address"},{"name":"owner","type":"address"},{"name":"active","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"id","type":"bytes32"}],"name":"kill","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"isClosed","outputs":[{"name":"closed","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"id","type":"uint256"}],"name":"getOwner","outputs":[{"name":"owner","type":"address"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"id","type":"uint256"},{"name":"quantity","type":"uint256"}],"name":"buy","outputs":[{"name":"success","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"sell_how_much","type":"uint256"},{"name":"sell_which_token","type":"address"},{"name":"buy_how_much","type":"uint256"},{"name":"buy_which_token","type":"address"}],"name":"offer","outputs":[{"name":"id","type":"uint256"}],"payable":false,"type":"function"},{"inputs":[{"name":"lifetime_","type":"uint256"}],"payable":false,"type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"id","type":"uint256"}],"name":"ItemUpdate","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"sell_how_much","type":"uint256"},{"indexed":true,"name":"sell_which_token","type":"address"},{"indexed":false,"name":"buy_how_much","type":"uint256"},{"indexed":true,"name":"buy_which_token","type":"address"}],"name":"Trade","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"id","type":"bytes32"},{"indexed":true,"name":"pair","type":"bytes32"},{"indexed":true,"name":"maker","type":"address"},{"indexed":false,"name":"haveToken","type":"address"},{"indexed":false,"name":"wantToken","type":"address"},{"indexed":false,"name":"haveAmount","type":"uint128"},{"indexed":false,"name":"wantAmount","type":"uint128"},{"indexed":false,"name":"timestamp","type":"uint64"}],"name":"LogMake","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"id","type":"bytes32"},{"indexed":true,"name":"pair","type":"bytes32"},{"indexed":true,"name":"maker","type":"address"},{"indexed":false,"name":"haveToken","type":"address"},{"indexed":false,"name":"wantToken","type":"address"},{"indexed":true,"name":"taker","type":"address"},{"indexed":false,"name":"takeAmount","type":"uint128"},{"indexed":false,"name":"giveAmount","type":"uint128"},{"indexed":false,"name":"timestamp","type":"uint64"}],"name":"LogTake","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"id","type":"bytes32"},{"indexed":true,"name":"pair","type":"bytes32"},{"indexed":true,"name":"maker","type":"address"},{"indexed":false,"name":"haveToken","type":"address"},{"indexed":false,"name":"wantToken","type":"address"},{"indexed":false,"name":"haveAmount","type":"uint128"},{"indexed":false,"name":"wantAmount","type":"uint128"},{"indexed":false,"name":"timestamp","type":"uint64"}],"name":"LogKill","type":"event"}];
-        return web3.eth.contract(abi);
+        return web3.eth.contract(oasisABI);
     }
 
-    fetchTrades(){
+    fetch(){
         console.log("fetchTrades");
 
         this.setState({
@@ -87,20 +88,22 @@ export class GenerateReportPage extends Component {
 
         let accounts = this.props.services[0].accounts;
 
-        for(let i = 0; i < accounts.length; i++) {
-            const fetchIssuedTrades = this.fetchIssuedTradesFor(accounts[i]);
-            const fetchAcceptedTrades = this.fetchAcceptedTrades(accounts[i]);
-            const fetchLegacyTrades = this.fetchLegacyTrades(accounts[i]);
+      //  for(let i = 0; i < accounts.length; i++) {
 
-            Promise.all([fetchIssuedTrades, fetchAcceptedTrades, fetchLegacyTrades]).then( () => {
-                this.setState({
-                    isLoading: false,
-                    hasPayed: true,
-                });
+         //   const fetchOasisAcceptedTrades = this.fetchAcceptedTrades(accounts[i]);
+         //   const fetchOasisLegacyTrades = this.fetchLegacyTrades(accounts[i]);
 
+      //  }
+        Promise.all(this.fetchEtherdeltaTradesFromAllContracts(accounts[0])).then( () => {
+            this.setState({
+                isLoading: false,
+                hasPayed: true,
             });
-        }
+
+        });
     }
+
+
 
     fetchLegacyTrades(address){
         return new Promise( (resolve, reject) => {
@@ -121,10 +124,66 @@ export class GenerateReportPage extends Component {
         });
     }
 
+   // address tokenGet, uint amountGet, address tokenGive, uint amountGive, address get, address give
+
+    fetchEtherdeltaTrades(address){
+
+        let contract = web3.eth.contract(etherdeltaABI).at(config.etherdelta.contract.live[0].address);
+
+        return new Promise((resolve, reject) => {
+            contract.Trade({}, {
+                fromBlock: config.etherdelta.contract.live[0].block_start,
+                toBlock: config.etherdelta.contract.live[0].block_end}).get( (error, logs) => {
+                if(!error){
+                    for(let i = 0; i < logs.length; i++){
+                        if(logs[i].args.get === address.name || logs[i].args.give ){
+                            console.log(logs[i].args);
+                        }
+                    }
+                    resolve();
+                }else {
+                    console.debug('Cannot fetch issued trades');
+                    reject();
+                }
+            });
+        });
+    }
+    fetchEtherdeltaTradesFromAllContracts(address){
+
+        var allPromises = [];
+
+        const allContracts = config.etherdelta.contract.live;
+
+        for(let i=0;i < allContracts.length;i++) {
+            let contract = web3.eth.contract(etherdeltaABI).at(allContracts[i].address);
+
+            allPromises.push(new Promise((resolve, reject) => {
+                contract.Trade({},
+                    {
+                        fromBlock: config.etherdelta.contract.live[i].block_start,
+                        toBlock: config.etherdelta.contract.live[i].block_end
+                    }).get((error, logs) => {
+                    if (!error) {
+                        for(let i = 0; i < logs.length; i++){
+                            if(logs[i].args.get === address.name || logs[i].args.give === address.name){
+                                console.log(logs[i]);
+                            }
+                        }
+                        resolve();
+                    } else {
+                        reject();
+                    }
+                });
+            }));
+        }
+
+        return allPromises;
+    }
+
     fetchAcceptedTrades(address){
         return new Promise((resolve, reject) => {
             this.state.oasis.LogTake({maker: address.name}, {
-                fromBlock: config.market.live.blockNumber,
+                fromBlock: config.oasis.contract.kovan.blockNumber,
                 toBlock: 'latest'}).get( (error, makeLogs) => {
                 if(!error){
                     for(let i=0;i < makeLogs.length; i++){
@@ -139,10 +198,11 @@ export class GenerateReportPage extends Component {
         });
     }
 
+
     fetchIssuedTradesFor(address) {
         return new Promise((resolve, reject) => {
             this.state.oasis.LogTake({taker: address.name}, {
-                fromBlock: config.market.live.blockNumber,
+                fromBlock: config.oasis.contract.kovan.blockNumber,
                 toBlock: 'latest'}).get( (error, takeLogs) => {
                 if(!error){
                     for(let i = 0; i < takeLogs.length; i++){
@@ -185,8 +245,8 @@ export class GenerateReportPage extends Component {
 
         let timestamp = new Date(log.timestamp * 1000).toLocaleString();
 
-        const wantToken = config.tokens.live[wantTokenAddress];
-        const haveToken = config.tokens.live[haveTokenAddress];
+        const wantToken = config.oasis.tokens.live[wantTokenAddress];
+        const haveToken = config.oasis.tokens.live[haveTokenAddress];
 
         console.log(wantTokenAddress);
         console.log(haveTokenAddress);
