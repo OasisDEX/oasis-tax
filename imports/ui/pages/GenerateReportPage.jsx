@@ -11,6 +11,12 @@ import BN from 'bn.js';
 import EthUtils from 'ethereumjs-util';
 import Web3 from 'web3';
 
+const tradeTypes = {
+    DELTA : "etherdelta",
+    OASIS : "oasis_event",
+    OASIS_LEGACY : "oasis_event"
+};
+
 export class GenerateReportPage extends Component {
 
     constructor(props){
@@ -80,26 +86,32 @@ export class GenerateReportPage extends Component {
     }
 
     fetch(){
-        console.log("fetchTrades");
 
         this.setState({
             isLoading: true,
         });
 
+        let promises = [];
+
         let accounts = this.props.services[0].accounts;
 
-      //  for(let i = 0; i < accounts.length; i++) {
+        for(let i = 0; i < accounts.length; i++) {
 
-         //   const fetchOasisAcceptedTrades = this.fetchAcceptedTrades(accounts[i]);
-         //   const fetchOasisLegacyTrades = this.fetchLegacyTrades(accounts[i]);
+            this.fetchEtherdeltaTradesFromAllContracts(accounts[i],promises);
+    //        const fetchOasisAcceptedTrades = this.fetchAcceptedTrades(accounts[i]);
+    //        const fetchOasisLegacyTrades = this.fetchLegacyTrades(accounts[i]);
 
-      //  }
-        Promise.all(this.fetchEtherdeltaTradesFromAllContracts(accounts[0])).then( () => {
+        }
+        Promise.all(promises).then( ( data ) => {
+            console.log(data);
+            return Promise.all(this.fetchAllTimeStampsFromEtherdelta(data));
+        }).then( (data) => {
+
+            console.log(data);
             this.setState({
                 isLoading: false,
                 hasPayed: true,
             });
-
         });
     }
 
@@ -114,7 +126,7 @@ export class GenerateReportPage extends Component {
                         const maker = EthUtils.addHexPrefix(data[i].taker);
                         if ( maker ===  address.name) {
                             console.log(data[i]);
-                            this.addTrade(address, data[i]);
+                            this.addTrade(address, data[i], tradeTypes.OASIS_LEGACY);
                         }
                     }
 
@@ -126,58 +138,66 @@ export class GenerateReportPage extends Component {
 
    // address tokenGet, uint amountGet, address tokenGive, uint amountGive, address get, address give
 
-    fetchEtherdeltaTrades(address){
-
-        let contract = web3.eth.contract(etherdeltaABI).at(config.etherdelta.contract.live[0].address);
-
-        return new Promise((resolve, reject) => {
-            contract.Trade({}, {
-                fromBlock: config.etherdelta.contract.live[0].block_start,
-                toBlock: config.etherdelta.contract.live[0].block_end}).get( (error, logs) => {
-                if(!error){
-                    for(let i = 0; i < logs.length; i++){
-                        if(logs[i].args.get === address.name || logs[i].args.give ){
-                            console.log(logs[i].args);
-                        }
-                    }
-                    resolve();
-                }else {
-                    console.debug('Cannot fetch issued trades');
-                    reject();
-                }
-            });
-        });
-    }
-    fetchEtherdeltaTradesFromAllContracts(address){
-
-        var allPromises = [];
+    fetchEtherdeltaTradesFromAllContracts(address, promises){
 
         const allContracts = config.etherdelta.contract.live;
 
         for(let i=0;i < allContracts.length;i++) {
             let contract = web3.eth.contract(etherdeltaABI).at(allContracts[i].address);
 
-            allPromises.push(new Promise((resolve, reject) => {
+            promises.push(new Promise((resolve, reject) => {
                 contract.Trade({},
                     {
                         fromBlock: config.etherdelta.contract.live[i].block_start,
                         toBlock: config.etherdelta.contract.live[i].block_end
                     }).get((error, logs) => {
                     if (!error) {
+                        let trades = [];
                         for(let i = 0; i < logs.length; i++){
                             if(logs[i].args.get === address.name || logs[i].args.give === address.name){
-                                console.log(logs[i]);
+                                let trade =  {
+                                    addr: address.name,
+                                    log: logs[i],
+                                    };
+
+                                trades.push(trade);
+                             //   console.log(logs[i]);
+                        //        this.addTrade(address, logs[i], tradeTypes.DELTA)
                             }
                         }
-                        resolve();
+                        resolve(trades);
                     } else {
                         reject();
                     }
                 });
             }));
         }
+    }
 
-        return allPromises;
+    fetchAllTimeStampsFromEtherdelta(data){
+        let trades= [];
+        let timeStampPromises = [];
+
+        for(let i=0; i < data.length; i++){
+        for(let j=0; j < data[i].length; j++ ){
+            timeStampPromises.push(
+                new Promise( (resolve, reject) => {
+                    web3.eth.getBlock(data[i][j].log.blockNumber, function(error, result){
+                        if(!error){
+                            console.log(result);
+                            data[i][j].timeStamp = result.timestamp;
+                            resolve(data);
+                        }else{
+                            console.error(error);
+                            reject();
+                        }
+                    });
+                })
+            );
+        }
+        }
+
+        return timeStampPromises;
     }
 
     fetchAcceptedTrades(address){
@@ -187,7 +207,7 @@ export class GenerateReportPage extends Component {
                 toBlock: 'latest'}).get( (error, makeLogs) => {
                 if(!error){
                     for(let i=0;i < makeLogs.length; i++){
-                        this.addTrade(address, makeLogs[i].args);
+                        this.addTrade(address, makeLogs[i].args, tradeTypes.OASIS);
                     }
                     resolve();
                 }else {
@@ -206,7 +226,7 @@ export class GenerateReportPage extends Component {
                 toBlock: 'latest'}).get( (error, takeLogs) => {
                 if(!error){
                     for(let i = 0; i < takeLogs.length; i++){
-                        this.addTrade(address, takeLogs[i].args);
+                        this.addTrade(address, takeLogs[i].args, tradeTypes.OASIS);
                     }
                     resolve();
                 }else {
@@ -217,39 +237,49 @@ export class GenerateReportPage extends Component {
         });
     }
 
-    addTrade(account, log){
+    addTrade(account, log, type){
 
         let giveAmount;
         let takeAmount;
         let haveTokenAddress;
         let wantTokenAddress;
+        let timestamp;
+        let wantToken;
+        let haveToken;
 
-        console.log(log);
+        switch(type){
+            case tradeTypes.OASIS_LEGACY :
+                giveAmount = web3.fromWei(new BN(log.giveAmount, 16).toString(10));
+                takeAmount = web3.fromWei(new BN(log.takeAmount, 16).toString(10));
 
-                //if legacy markets
-                if ( typeof log.giveAmount === 'string' ){
-                    giveAmount = web3.fromWei(new BN(log.giveAmount, 16).toString(10));
-                    takeAmount = web3.fromWei(new BN(log.takeAmount, 16).toString(10));
+                haveTokenAddress = EthUtils.addHexPrefix(log.giveAmount);
+                wantTokenAddress = EthUtils.addHexPrefix(log.takeAmount);
 
-                    haveTokenAddress = EthUtils.addHexPrefix(log.giveAmount);
-                    wantTokenAddress = EthUtils.addHexPrefix(log.takeAmount);
-                }else{
-                    giveAmount = web3.fromWei(log.giveAmount.toString(10));
-                    takeAmount = web3.fromWei(log.takeAmount.toString(10));
+                timestamp = new Date(log.timestamp * 1000).toLocaleString();
+                wantToken = config.oasis.tokens.live[wantTokenAddress];
+                haveToken = config.oasis.tokens.live[haveTokenAddress];
+                break;
+            case tradeTypes.OASIS:
+                giveAmount = web3.fromWei(log.giveAmount.toString(10));
+                takeAmount = web3.fromWei(log.takeAmount.toString(10));
 
-                    haveTokenAddress = log.haveToken;
-                    wantTokenAddress = log.wantToken;
-                }
+                haveTokenAddress = log.haveToken;
+                wantTokenAddress = log.wantToken;
+                wantToken = config.oasis.tokens.live[wantTokenAddress];
+                haveToken = config.oasis.tokens.live[haveTokenAddress];
 
+                timestamp = new Date(log.timestamp * 1000).toLocaleString();
+                break;
+            case tradeTypes.DELTA:
+                giveAmount = web3.fromWei(log.amountGive.toString(10));
+                takeAmount = web3.fromWei(log.amountGet.toString(10));
 
+                haveTokenAddress = log.tokenGive;
+                wantTokenAddress = log.tokenGet;
 
-        let timestamp = new Date(log.timestamp * 1000).toLocaleString();
+                break;
 
-        const wantToken = config.oasis.tokens.live[wantTokenAddress];
-        const haveToken = config.oasis.tokens.live[haveTokenAddress];
-
-        console.log(wantTokenAddress);
-        console.log(haveTokenAddress);
+        }
 
         let trade = {
             'Type'     : 'Trade',
