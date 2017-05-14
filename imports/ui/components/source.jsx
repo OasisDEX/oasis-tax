@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import Picker from '../lists/picker'
 import Services from "../lists/services";
 import InputGroup from "../elements/item_input";
+import EthUtils from 'ethereumjs-util';
+
 
 export default class Source extends Component {
 
@@ -49,22 +51,14 @@ export default class Source extends Component {
     }
 
     removeAccount(accRemov){
-        console.log(accRemov);
-
-        console.log("without filter Service");
-        console.log(this.props.services);
 
          let service = this.props.services.filter((service) => service.provider === accRemov.provider)[0];
-         console.log("filtered Service");
-         console.log(service);
 
          service.accounts.map( (account,index) => {
              if(account.name === accRemov.name){
                  service.accounts.splice(index,1);
              }
          });
-
-        console.log("removed Account");
 
          let changedServices = this.props.services;
         console.log(changedServices);
@@ -80,28 +74,33 @@ export default class Source extends Component {
 
     handleSubmit(accountName) {
 
-        let pickedService = this.state.active;
-        let serviceName = this.props.services[pickedService].provider;
+        if(EthUtils.isValidAddress(accountName)){
+            console.log("not valid");
+            let pickedService = this.state.active;
+            let serviceName = this.props.services[pickedService].provider;
 
-        let service = this.props.services.filter((service) => service.provider === serviceName);
-        console.log(service);
-        let serviceAccounts = service[0].accounts.filter( (account) => account.name === accountName);
+            let service = this.props.services.filter((service) => service.provider === serviceName);
+            let serviceAccounts = service[0].accounts.filter( (account) => account.name === accountName);
 
-        if(serviceAccounts.length === 0){
+            if(serviceAccounts.length === 0){
 
-            let account = {
-                name: accountName,
-                provider: serviceName,
-                trades: [],
-            };
-            service[0].accounts.push(account);
-            let la = this.props.services;
+                let account = {
+                    name: accountName,
+                    provider: serviceName,
+                    trades: [],
+                };
+                service[0].accounts.push(account);
+                let la = this.props.services;
 
-            this.props.changeState(la,pickedService);
+                this.props.changeState(la,pickedService);
 
-        }else{
-            alert("duplicate");
+            }else{
+                alert("duplicate");
+            }
+        }else {
+            this.props.alert();
         }
+
     }
 }
 
@@ -122,5 +121,6 @@ Source.PropTypes = {
             ).isRequired
     })).isRequired,
     changeState: PropTypes.func.isRequired,
+    alert: PropTypes.func.isRequired,
 
 };

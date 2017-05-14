@@ -7,6 +7,13 @@ import {Link} from 'react-router-dom';
 import { createContainer } from 'meteor/react-meteor-data';
 
 export class ConfigurationPage extends Component {
+
+    constructor(props){
+        super(props);
+        this.state = {
+            showAlert: false,
+        }
+    }
     render(){
        return (
            <div>
@@ -14,6 +21,7 @@ export class ConfigurationPage extends Component {
                    active={this.props.active}
                    services={this.props.services}
                    changeState={this.props.changeState}
+                   alert={this.showAlert.bind(this)}
                />
 
                <Export
@@ -22,14 +30,41 @@ export class ConfigurationPage extends Component {
                    updateEmail={this.props.updateEmail}
                />
 
-               <Link to={'/payment'}>
-                   <button type="button" className="btn btn-primary btn-generate">Next</button>
-               </Link>
+               <div className="row">
+                   <div className="col-md-8">
+                       {this.alertNecessary()}
+                   </div>
+                   <div className="col-md-4">
+                       <Link to={'/payment'}>
+                           <button type="button" className="btn btn-primary btn-generate">Next</button>
+                       </Link>
+                   </div>
+               </div>
            </div>
        );
 
     }
+
+
+    showAlert(){
+        this.setState({
+            showAlert: true,
+        });
+    }
+
+    alertNecessary(){
+        if(this.state.showAlert){
+            return (
+                <div className="alert alert-success alert-dismissable">
+                    <a href="#" className="close" data-dismiss="alert" aria-label="close">&times;</a>
+                    <strong>Success!</strong> Indicates a successful or positive action.
+                </div>
+            );
+
+        }
+    }
 }
+
 
 export default createContainer(({active, email, services, changeState, updateEmail}) => {
     return {

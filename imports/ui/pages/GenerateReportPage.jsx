@@ -151,7 +151,7 @@ export class GenerateReportPage extends Component {
     fetchLegacyTrades(address) {
         return new Promise((resolve, reject) => {
             for (let j = 2; j < 15; j++) {
-                HTTP.get(Meteor.absoluteUrl("/maker-otc-" + j + ".trades.json"), (err, result) => {
+                HTTP.get(Meteor.absoluteUrl("./maker-otc-" + j + ".trades.json"), (err, result) => {
                     let data = result.data;
                     for (let i = 0; i < data.length; i++) {
                         const taker = EthUtils.addHexPrefix(data[i].taker);
@@ -357,14 +357,13 @@ export class GenerateReportPage extends Component {
 
             if (wantTokenAddress === baseCurrency) {
                 console.log('bid');
-                wantToken = config.etherdelta.tokens[haveTokenAddress];
-                haveToken = config.etherdelta.tokens[wantTokenAddress];
+                wantToken = config.tokens.live[haveTokenAddress];
+                haveToken = config.tokens.live[wantTokenAddress];
             } else if (haveTokenAddress === baseCurrency) {
                 console.log('ask');
-                wantToken = config.etherdelta.tokens[wantTokenAddress];
-                haveToken = config.etherdelta.tokens[haveTokenAddress];
+                wantToken = config.tokens.live[wantTokenAddress];
+                haveToken = config.tokens.live[haveTokenAddress];
             }
-
 
             if (typeof wantToken === 'undefined') {
                 wantToken = data[i].log.args.tokenGet;
