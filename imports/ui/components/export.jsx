@@ -52,7 +52,7 @@ Export.PropTypes = {
             provider: PropTypes.string.isRequired,
             type: PropTypes.string.isRequired,
             url: PropTypes.string.isRequired,
-            options: PropTypes.arrayOf(
+            name: PropTypes.arrayOf(
                 PropTypes.shape({
                     active: PropTypes.bool.isRequired,
                     option: PropTypes.string.isRequired,

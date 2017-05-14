@@ -47,7 +47,7 @@ Services.propTypes = {
             options: PropTypes.arrayOf(
                 PropTypes.shape({
                     active: PropTypes.bool.isRequired,
-                    option: PropTypes.string.isRequired,
+                    name: PropTypes.string.isRequired,
                 })
             ).isRequired
         })).isRequired,
