@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import Option from "../elements/item_option";
 
 
 export default class Settings extends Component {
@@ -25,24 +26,12 @@ export default class Settings extends Component {
 
     renderOption(option){
         return (
-                <li className="list-group-item" key={option.option}>
-                    <div className="checkbox">
-                        <label>
-                            <input type="checkbox"
-                                   value={option.id}
-                                   onChange={this.clicked.bind(this)}
-                                   defaultChecked={option.active}
-                            />
-                            {option.option}
-                        </label>
-                    </div>
-                </li>
+                <Option
+                    option={option}
+                />
             );
     }
 
-    clicked(event){
-        console.log(event.target.value);
-    }
 }
 
 
@@ -58,7 +47,7 @@ Settings.PropTypes = {
             options: PropTypes.arrayOf(
                 PropTypes.shape({
                     active: PropTypes.bool.isRequired,
-                    option: PropTypes.string.isRequired,
+                    name: PropTypes.string.isRequired,
                 })
             ).isRequired
         })).isRequired,

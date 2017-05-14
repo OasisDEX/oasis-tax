@@ -1,42 +1,29 @@
 {
-  "etherdelta": {
-    "contract": {
-      "live": [
-        {
-          "address":"0xc6b330dF38D6eF288C953F1F2835723531073CE2",
-          "block_start": 1848513,
-          "block_end": 1922995
-        },
-        {
-          "address":"0x2136bbBa2eDcA21AFDddee838fFf19eA70D10F03",
-          "block_start": 2008140,
-          "block_end": 	2162063
-        },
-        {
-          "address":"0x4aEa7cf559F67ceDCAD07E12aE6bc00F07E8cf65",
-          "block_start": 2168312,
-          "block_end": 2505919
-        },
-        {
-          "address":"0x373C55C277b866A69dC047cAd488154AB9759466",
-          "block_start": 2500744,
-          "block_end": 3153197
-        },
-        {
-          "address":"0x8d12A197cB00D4747a1fe03395095ce2A5CC6819",
-          "block_start": 3154196,
-          "block_end": "latest"
-        }
-        ]
-      },
-    "baseCurrency": "0x0000000000000000000000000000000000000000"
-    ,
-    "tokens": {
+  "tokens": {
+    "kovan": {
+      "0x53eccc9246c1e537d79199d0c7231e425a40f896": "ETH",
+      "0x4bb514a7f83fbb13c2b41448208e89fabbcfe2fb": "MKR",
+      "0xbb7697d091a2b9428053e2d42d088fcd2a6a0aaf": "DGD",
+      "0xece9fa304cc965b00afc186f5d0281a00d3dbbfd": "GNT",
+      "0xbd1ceb35769eb44b641c8e257005817183fc2817": "W-GNT",
+      "0x99e846cfe0321260e51963a2114bc4008d092e24": "REP",
+      "0x8a55df5de91eceb816bd9263d2e5f35fd516d4d0": "ICN",
+      "0x846f258ac72f8a60920d9b613ce9e91f8a7a7b54": "1ST",
+      "0xf7d57c676ac2bc4997ca5d4d34adc0d072213d29": "SNGLS",
+      "0x2e65483308968f5210167a23bdb46ec94752fe39": "VSL",
+      "0x00a0fcaa32b47c4ab4a8fdda6d108e5c1ffd8e4f": "PLU",
+      "0xc3ce96164012ed51c9b1e34a9323fdc38c96ad8a": "MLN",
+      "0x7352c20e00d3c89037a8959699741c341771ed59": "RHOC",
+      "0xd944954588061c969fbd828d1f00c297c3511dbd": "TIME",
+      "0xa786d73316e43c3361145241755566e72424274c": "GUP"
+    },
+    "live": {
+      "0xecf8f87f810ecf450940c9f60066b4a7a501d6a7": "ETH",
       "0x0000000000000000000000000000000000000000": "ETH",
       "0xd8912c10681d8b21fd3742244f44658dba12264e": "PLU",
       "0xaf30d2a7e90d7dc361c8c4585e9bb7d2f6f15bc7": "1ST",
-      "0x936f78b9852d12f5cb93177c1f84fb8513d06263": "GNTW",
-      "0x01afc37f4f85babc47c0e2d0eababc7fb49793c8": "GNTM",
+      "0x936f78b9852d12f5cb93177c1f84fb8513d06263": "GNT",
+      "0x01afc37f4f85babc47c0e2d0eababc7fb49793c8": "GNT",
       "0xa74476443119a942de498590fe1f2454d7d4ac0d": "GNT",
       "0x5c543e7ae0a1104f78406c340e9c64fd9fce5170": "VSL",
       "0xac709fcb44a43c35f0da4e3163b117a17f3770f5": "ARC",
@@ -75,8 +62,43 @@
       "0xfa05a73ffe78ef8f1a739473e462c54bae6567d9": "LUN",
       "0xaaaf91d9b90df800df4f55c205fd6989c977e73a": "TKN",
       "0xcbcc0f036ed4788f63fc0fee32873d6a7487b908": "HMQ"
-      }
+    }
+  },
+
+  "etherdelta": {
+    "contract": {
+      "live": [
+        {
+          "address":"0xc6b330dF38D6eF288C953F1F2835723531073CE2",
+          "block_start": 1848513,
+          "block_end": 1922995
+        },
+        {
+          "address":"0x2136bbBa2eDcA21AFDddee838fFf19eA70D10F03",
+          "block_start": 2008140,
+          "block_end": 	2162063
+        },
+        {
+          "address":"0x4aEa7cf559F67ceDCAD07E12aE6bc00F07E8cf65",
+          "block_start": 2168312,
+          "block_end": 2505919
+        },
+        {
+          "address":"0x373C55C277b866A69dC047cAd488154AB9759466",
+          "block_start": 2500744,
+          "block_end": 3153197
+        },
+        {
+          "address":"0x8d12A197cB00D4747a1fe03395095ce2A5CC6819",
+          "block_start": 3154196,
+          "block_end": "latest"
+        }
+        ]
+      },
+    "baseCurrency": "0x0000000000000000000000000000000000000000"
     },
+
+
   "oasis": {
     "contract": {
       "kovan": {
@@ -92,78 +114,26 @@
         "blockNumber": 3435757
       }
     },
-    "baseCurrency": "0xecf8f87f810ecf450940c9f60066b4a7a501d6a7",
-    "tokens": {
-      "kovan": {
-        "0x53eccc9246c1e537d79199d0c7231e425a40f896": "ETH",
-        "0x0000000000000000000000000000000000000000": "DAI",
-        "0x4bb514a7f83fbb13c2b41448208e89fabbcfe2fb": "MKR",
-        "0xbb7697d091a2b9428053e2d42d088fcd2a6a0aaf": "DGD",
-        "0xece9fa304cc965b00afc186f5d0281a00d3dbbfd": "GNT",
-        "0xbd1ceb35769eb44b641c8e257005817183fc2817": "W-GNT",
-        "0x99e846cfe0321260e51963a2114bc4008d092e24": "REP",
-        "0x8a55df5de91eceb816bd9263d2e5f35fd516d4d0": "ICN",
-        "0x846f258ac72f8a60920d9b613ce9e91f8a7a7b54": "1ST",
-        "0xf7d57c676ac2bc4997ca5d4d34adc0d072213d29": "SNGLS",
-        "0x2e65483308968f5210167a23bdb46ec94752fe39": "VSL",
-        "0x00a0fcaa32b47c4ab4a8fdda6d108e5c1ffd8e4f": "PLU",
-        "0xc3ce96164012ed51c9b1e34a9323fdc38c96ad8a": "MLN",
-        "0x7352c20e00d3c89037a8959699741c341771ed59": "RHOC",
-        "0xd944954588061c969fbd828d1f00c297c3511dbd": "TIME",
-        "0xa786d73316e43c3361145241755566e72424274c": "GUP"
-      },
-      "ropsten": {
-        "0xece9fa304cc965b00afc186f5d0281a00d3dbbfd": "ETH",
-        "0x0000000000000000000000000000000000000000": "DAI",
-        "0xa7f6c9a5052a08a14ff0e3349094b6efbc591ea4": "MKR",
-        "0x1ab3bd2e2670d6e00ca406217e4d327f7f946d7e": "DGD",
-        "0x7fb3c4ff78bd0305a6ec436eda79303f981c5938": "GNT",
-        "0xa5d92f318247c3b43241436dbb55ec4be600dc42": "W-GNT",
-        "0xf75caa57375a75dfc1a7ea917d6abb2c95511053": "REP",
-        "0x5b73d26807ea72287bafa1a27fccf8ece5deabc4": "ICN",
-        "0xa8c784efdfe7d48bc5df28f770b6454a037e2abe": "1ST",
-        "0xf48cf5ad04afa369fe1ae599a8f3699c712b0352": "SNGLS",
-        "0x5017f42cf680fcbcab1093263468745c9af63e35": "VSL",
-        "0xcfe185ce294b443c16dd89f00527d8b25c45bf9d": "PLU",
-        "0xd4a8f8293d639752e263be3869057eaf7536e005": "MLN",
-        "0x0000000000000000000000000000000000000000": "GUP"
-      },
-      "live": {
-        "0xecf8f87f810ecf450940c9f60066b4a7a501d6a7": "ETH",
-        "0x0000000000000000000000000000000000000000": "DAI",
-        "0xc66ea802717bfb9833400264dd12c2bceaa34a6d": "MKR",
-        "0xe0b7927c4af23765cb51314a0e0521a9645f0e2a": "DGD",
-        "0xa74476443119a942de498590fe1f2454d7d4ac0d": "GNT",
-        "0x01afc37f4f85babc47c0e2d0eababc7fb49793c8": "W-GNT",
-        "0x48c80f1f4d53d5951e5d5438b54cba84f29f32a5": "REP",
-        "0x888666ca69e0f178ded6d75b5726cee99a87d698": "ICN",
-        "0xaf30d2a7e90d7dc361c8c4585e9bb7d2f6f15bc7": "1ST",
-        "0xaec2e87e0a235266d9c5adc9deb4b2e29b54d009": "SNGLS",
-        "0x5c543e7ae0a1104f78406c340e9c64fd9fce5170": "VSL",
-        "0xd8912c10681d8b21fd3742244f44658dba12264e": "PLU",
-        "0xbeb9ef514a379b997e0798fdcc901ee474b6d9a1": "MLN",
-        "0x168296bb09e24a88805cb9c33356536b980d3fc5": "RHOC",
-        "0x6531f133e6deebe7f2dce5a0441aa7ef330b4e53": "TIME",
-        "0xf7b098298f7c69fc14610bf71d5e02c60792894c": "GUP"
-      }
-    }
+    "baseCurrency": "0xecf8f87f810ecf450940c9f60066b4a7a501d6a7"
+    },
 
-  },
+
   "csv": {
     "title": "TaxReport",
     "header": ["Type","Buy","Cur.","Sell","Cur.","Fee","Cur.", "Exchange","Comment","Date"]
   },
 
+
   "services": [
     { "provider": "ethereum", "type": "address", "url": "oasisdex.com", "options" : [
-      { "active": true, "option": "Load data from Oasis (https://oasisdex.com)" },
-      { "active": false, "option": "Load data from Etherdelta (https://ether.delta)" }
+      { "active": true, "name": "Load data from Oasis (https://oasisdex.com)" },
+      { "active": false, "name": "Load data from Etherdelta (https://ether.delta)" }
     ]},
     { "provider": "steem", "type": "username", "url": "steemit.com", "options": [
 
     ]},
     { "provider": "bitshares", "type": "username", "url": "bitshares.org", "options": [
-      { "active": false, "option": "Alias IOU assets on Bitshares" }
+      { "active": false, "name": "Alias IOU assets on Bitshares" }
     ]}
   ]
 }

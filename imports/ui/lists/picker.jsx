@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 
-
 export default class Picker extends Component {
 
     constructor(props){
@@ -27,6 +26,8 @@ export default class Picker extends Component {
     }
 
     renderElement(service){
+
+        console.log(service.id);
         return(
             <li className="list-group-item" key={service.id}>
             <div className="radio">
@@ -37,6 +38,7 @@ export default class Picker extends Component {
                         name="myGroupName"
                         checked={this.state.selectedOption == service.id}
                         onChange={this.handleOptionChange.bind(this)}
+                        disabled={service.id !== 0}
                     />
                     <span className="picker-label">{service.provider}</span>
                 </label>
