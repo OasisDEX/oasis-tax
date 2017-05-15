@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -ex
+while read -r trade; do
+  type1=$(jshon -e type -u <<<"$trade")
+  if [[ $type1 = Trade ]]; then
+    tx=$(jshon -e tx -u <<<"$trade")
+    read -r update
+    type2=$(jshon -e type -u <<<"$update")
+    if [[ $type2 = ItemUpdate ]]; then
+      block=$(seth tx "$tx" blockNumber)
+      id=$(jshon -e data -e id -u <<<"$update")
+      maker=$(seth call -B "$((block - 1))" "${market?}" \
+      'getOwner(uint256)(address)' "$id")
+      haveToken=$(jshon -e data -e sell_which_token -u <<<"$trade")
+      wantToken=$(jshon -e data -e buy_which_token -u <<<"$trade")
+      taker=$(seth tx "$tx" from)
+      takeAmount=$(jshon -e data -e sell_how_much -u <<<"$trade")
+      giveAmount=$(jshon -e data -e buy_how_much -u <<<"$trade")
+      timestamp=$(seth block "$block" timestamp)
+      jshon <<<{} \
+      -s "$maker" -i maker \
+      -s "$haveToken" -i haveToken \
+      -s "$wantToken" -i wantToken \
+      -s "$taker" -i taker \
+      -s "$takeAmount" -i takeAmount \
+      -s "$giveAmount" -i giveAmount \
+      -s "$timestamp" -i timestamp \
+      -j
+    else
+      echo >&2 error: missing ItemUpdate event
+      exit 1
+    fi
+  fi
+done
