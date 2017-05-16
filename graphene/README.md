@@ -14,7 +14,7 @@ Extracts potentially taxable transactions from Graphene based blockchains, such 
 - Python3.5 or greater
 
 - Yaml: ```pip3 install pyyaml``` or 
-        ```sudo apt-get install python-yaml````
+        ```sudo apt-get install python-yaml```
 
 - Python-Graphenelib `https://github.com/xeroc/python-graphenelib`
 - Python-Bitshares `https://github.com/xeroc/python-bitshares`
