@@ -3,12 +3,11 @@ import Picker from '../lists/picker'
 import Services from "../lists/services";
 import InputGroup from "../elements/item_input";
 import Provider from "../providers";
+import PropTypes from 'prop-types';
+import {addAccount,removeAccount} from "./../actions/userActions";
 import { connect } from "react-redux";
-import {addAccount, removeAccount} from "../../ui/actions/userActions"
 
-
-
- class Source extends Component {
+class Source extends Component {
 
     constructor(props){
         super(props);
@@ -69,11 +68,17 @@ import {addAccount, removeAccount} from "../../ui/actions/userActions"
 
 
 }
+
+Source.PropTypes = {
+    accounts: PropTypes.object.isRequired
+};
+
 const mapStateToProps = (state) => {
     return {
         accounts: state.user.accounts,
     };
 };
+
 
 const mapDispatchToProps = (dispatch) => {
     return {
@@ -87,5 +92,6 @@ const mapDispatchToProps = (dispatch) => {
 };
 
 export default connect(mapStateToProps,mapDispatchToProps)(Source);
+
 
 

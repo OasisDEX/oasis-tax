@@ -1,11 +1,13 @@
 import React, {Component} from 'react';
-import PropTypes from 'prop-types';
 import { createContainer } from 'meteor/react-meteor-data';
 import Settings from "../lists/settings";
 import InputGroup from "../elements/item_input";
 import ListItemEmail from "../elements/item_email";
+import {setEmail,enableOption,disableOption} from "./../actions/settingsActions";
+import { connect } from "react-redux";
 
-export default class Export extends Component {
+
+class Export extends Component {
 
 
     render(){
@@ -14,16 +16,15 @@ export default class Export extends Component {
             <div className="panel-heading">
                 Export Settings
             </div>
-                <Settings services={this.props.services}/>
+                <Settings settings={this.props.settings}/>
                 {this.renderEmailItem()}
                 <div className="panel-body">
-                    <InputGroup placeHolder={"Enter Email Address "} handleSubmit={this.addEmail.bind(this)}/>
+                    <InputGroup placeHolder={"Enter Email Address "} handleSubmit={this.handleEmail.bind(this)}/>
                 </div>
         </div>);
     }
 
     renderEmailItem(){
-        if(this.props.email.length > 0 ){
             return (
                 <ul className="list-group picker-container">
                     <ListItemEmail
@@ -31,34 +32,35 @@ export default class Export extends Component {
                     />
                 </ul>
             );
-        }
     }
 
-    addEmail(newEmail){
-        this.props.updateEmail(newEmail);
+    handleEmail(email){
+        this.props.setEmail(email);
     };
 
 }
 
 
-
-
-Export.PropTypes = {
-    email: PropTypes.string.isRequired,
-    services: PropTypes.arrayOf(
-        PropTypes.shape({
-            id: PropTypes.number.isRequired,
-            accounts: PropTypes.array.isRequired,
-            provider: PropTypes.string.isRequired,
-            type: PropTypes.string.isRequired,
-            url: PropTypes.string.isRequired,
-            name: PropTypes.arrayOf(
-                PropTypes.shape({
-                    active: PropTypes.bool.isRequired,
-                    option: PropTypes.string.isRequired,
-                })
-            ).isRequired
-        })).isRequired,
-    updateEmail: PropTypes.func.isRequired,
-
+const mapStateToProps = (state) => {
+    return {
+        settings: state.settings,
+    };
 };
+
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        enableOption: (option) => {
+            dispatch(enableOption(option));
+        },
+        disableOption: (option) => {
+            dispatch(disableOption(name));
+        },
+        setEmail: (email) => {
+            dispatch(setEmail(email));
+        },
+    }
+};
+
+export default connect(mapStateToProps,mapDispatchToProps)(Export);
+

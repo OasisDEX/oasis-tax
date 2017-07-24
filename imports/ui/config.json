@@ -121,19 +121,5 @@
   "csv": {
     "title": "TaxReport",
     "header": ["Type","Buy","Cur.","Sell","Cur.","Fee","Cur.", "Exchange","Comment","Date"]
-  },
-
-
-  "services": [
-    { "provider": "ethereum", "type": "address", "url": "oasisdex.com", "options" : [
-      { "active": true, "name": "Load data from Oasis (https://oasisdex.com)" },
-      { "active": false, "name": "Load data from Etherdelta (https://ether.delta)" }
-    ]},
-    { "provider": "steem", "type": "username", "url": "steemit.com", "options": [
-
-    ]},
-    { "provider": "bitshares", "type": "username", "url": "bitshares.org", "options": [
-      { "active": false, "name": "Alias IOU assets on Bitshares" }
-    ]}
-  ]
+  }
 }

@@ -15,14 +15,8 @@ export default class Settings extends Component {
 
 
     renderServices() {
-        return this.props.services.map((service) => this.renderOptions(service));
+        return this.props.settings.options.map((option) => this.renderOption(option));
         }
-
-    renderOptions(service){
-        if (service.accounts.length > 0 ) {
-            return service.options.map((options) => this.renderOption(options));
-        }
-    }
 
     renderOption(option){
         return (
@@ -37,18 +31,5 @@ export default class Settings extends Component {
 
 
 Settings.PropTypes = {
-    services: PropTypes.arrayOf(
-        PropTypes.shape({
-            id: PropTypes.number.isRequired,
-            accounts: PropTypes.array.isRequired,
-            provider: PropTypes.string.isRequired,
-            type: PropTypes.string.isRequired,
-            url: PropTypes.string.isRequired,
-            options: PropTypes.arrayOf(
-                PropTypes.shape({
-                    active: PropTypes.bool.isRequired,
-                    name: PropTypes.string.isRequired,
-                })
-            ).isRequired
-        })).isRequired,
+    settings: PropTypes.array.isRequired
 };

@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { createContainer } from 'meteor/react-meteor-data';
 import { connect } from "react-redux";
 import Source from "./components/source";
+import Export from "./components/export";
+
 
 class App extends Component {
     render() {
@@ -16,9 +18,11 @@ class App extends Component {
                         </div>
                     </nav>
                 <Source/>
+                <Export/>
                 </div>
         );
     }
 }
+
 export default connect()(App);
 
