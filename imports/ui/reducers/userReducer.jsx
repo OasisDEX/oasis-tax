@@ -16,6 +16,14 @@ const providerReducer = (
                 }
             };
             break;
+        case "REMOVE_ACCOUNT":
+            state = {
+                accounts: {
+                    ...state.accounts,
+                    [action.payload.providerName]: state.accounts[action.payload.providerName].filter(item => action.payload !== item),
+                }
+            };
+            break;
     }
     return state;
 };

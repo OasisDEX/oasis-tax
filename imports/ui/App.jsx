@@ -4,7 +4,6 @@ import { connect } from "react-redux";
 import Source from "./components/source";
 
 class App extends Component {
-
     render() {
         return (
                 <div className="container">
@@ -20,7 +19,6 @@ class App extends Component {
                 </div>
         );
     }
-
 }
 export default connect()(App);
 

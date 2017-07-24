@@ -23,12 +23,12 @@ export default class Services extends Component {
     }
 
 
-
     renderAccount(account,index){
         return (
             <Account account={account}
                      key={index}
                      providerIsVisible={ index === 0}
+                     removeAccount={this.props.removeAccount}
             />
         );
     }

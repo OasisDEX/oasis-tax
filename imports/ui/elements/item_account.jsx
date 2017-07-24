@@ -6,6 +6,7 @@ export default class Account extends Component {
 
 
     render(){
+          isRemovable = true;
           return(
               <li className="list-group-item">
                 <div className="row">
@@ -69,4 +70,5 @@ export default class Account extends Component {
 Account.PropTypes = {
     account: PropTypes.object.isRequired,
     providerIsVisible: PropTypes.bool.isRequired,
+    removeAccount: PropTypes.func,
 };
