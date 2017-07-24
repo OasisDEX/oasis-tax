@@ -12,7 +12,7 @@ import EthUtils from 'ethereumjs-util';
 import Web3 from 'web3';
 
 
-export class GenerateReportPage extends Component {
+export default class GenerateReportPage extends Component {
 
     constructor(props) {
         super(props);
@@ -474,13 +474,6 @@ export class GenerateReportPage extends Component {
         document.body.removeChild(link);
     }
 }
-
-
-export default createContainer(({services}) => {
-    return {
-        services: services,
-    }
-}, GenerateReportPage);
 
 GenerateReportPage.PropTypes = {
     services: PropTypes.arrayOf(

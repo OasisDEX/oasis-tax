@@ -1,30 +1,12 @@
 import React, { Component } from 'react';
-import {BrowserRouter as Router, Link, Route} from 'react-router-dom';
-import createBrowserHistory from 'history/createBrowserHistory';
 import { createContainer } from 'meteor/react-meteor-data';
-import ConfigurationPage from './pages/ConfigurationPage';
-import GenerateReportPage from './pages/GenerateReportPage';
-import config from './config.json';
+import { connect } from "react-redux";
+import Source from "./components/source";
 
-const history = createBrowserHistory();
+class App extends Component {
 
-
-export class App extends Component {
-
-    constructor(props){
-        super(props);
-
-        this.state = {
-            active: 0,
-            services: this.getServicesFromConfigFile(),
-            email: '',
-        };
-    }
     render() {
         return (
-            <Router history={history}>
-                <div>
-
                 <div className="container">
                     <nav className="navbar navbar-default">
                         <div className="container-fluid">
@@ -32,77 +14,13 @@ export class App extends Component {
                                 <a className="navbar-brand" href="#">Token.tax</a>
                                 <a className="navbar-brand" href="#">a Dapphub.com Service</a>
                             </div>
-
                         </div>
                     </nav>
-                    <Route
-                        exact path="/"
-                        render={() =>
-                            (<ConfigurationPage
-                                active={this.state.active}
-                                email={this.state.email}
-                                services={this.state.services}
-                                changeState={this.changeState.bind(this)}
-                                updateEmail={this.updateEmail.bind(this)}
-                            />)}
-                    />
-                    <Route
-                        path="/payment"
-                        render={() =>(
-                            <GenerateReportPage
-                                services={this.state.services}
-                                addAccount={this.addAccount.bind(this)}
-                            />
-                        )}/>
+                <Source/>
                 </div>
-
-                </div>
-            </Router>
         );
-
     }
-
-
-    getServicesFromConfigFile(){
-
-        var jsonArr = [];
-
-        let servicesArr = config.services;
-
-        for (let i = 0; i < config.services.length; i++) {
-            jsonArr.push({
-                id: i,
-                accounts: [],
-                provider: servicesArr[i].provider,
-                type: servicesArr[i].type,
-                url: servicesArr[i].url,
-                options: servicesArr[i].options
-            });
-        }
-        return jsonArr
-    }
-
-    changeState(service,pickedService){
-        this.setState({
-            services: service,
-            active: pickedService,
-        });
-    }
-
-    addAccount(services){
-        console.log(services);
-        this.setState({
-            services: services,
-        });
-    }
-
-    updateEmail(newEmail){
-        this.setState({
-            email: newEmail,
-        });
-    }
-
 
 }
+export default connect()(App);
 
-export default AppContainer = createContainer(() => { return {}; }, App);

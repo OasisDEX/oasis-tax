@@ -1,15 +1,20 @@
 import React, {Component} from 'react';
-import PropTypes from 'prop-types';
 import Picker from '../lists/picker'
 import Services from "../lists/services";
 import InputGroup from "../elements/item_input";
+import Provider from "../providers";
+import PropTypes from 'prop-types';
+import { connect } from "react-redux";
+import {addAccount} from "../../ui/actions/userActions"
 
-export default class Source extends Component {
+
+
+ class Source extends Component {
 
     constructor(props){
         super(props);
         this.state = {
-            active: this.props.active,
+            active: 0,
         };
     }
 
@@ -21,7 +26,8 @@ export default class Source extends Component {
 
     renderElements(){
 
-        let placeHolder = "Enter " + this.props.services[this.state.active].provider + " " + this.props.services[this.state.active].type;
+        console.log(this.props.accounts);
+        let placeHolder = "Enter " //+ this.props.user.providers[this.state.active].name + " " + this.props.user.providers[this.state.active].type;
 
         return(
             <div className="panel panel-default">
@@ -31,12 +37,12 @@ export default class Source extends Component {
                 </div>
 
                 <Services
-                    services={this.props.services}
-                    removeAccount={this.removeAccount.bind(this)}
+                    accounts={this.props.accounts}
+                    providers={Provider}
                 />
 
                 <Picker
-                    services={this.props.services}
+                    services={Provider}
                     active={this.state.active}
                     changePlaceHolderText={this.changePlaceHolder.bind(this)}/>
 
@@ -47,6 +53,7 @@ export default class Source extends Component {
             </div>
         );
     }
+
 
     removeAccount(accRemov){
         console.log(accRemov);
@@ -79,48 +86,30 @@ export default class Source extends Component {
     }
 
     handleSubmit(accountName) {
-
-        let pickedService = this.state.active;
-        let serviceName = this.props.services[pickedService].provider;
-
-        let service = this.props.services.filter((service) => service.provider === serviceName);
-        console.log(service);
-        let serviceAccounts = service[0].accounts.filter( (account) => account.name === accountName);
-
-        if(serviceAccounts.length === 0){
-
             let account = {
                 name: accountName,
-                provider: serviceName,
+                providerName: Provider[this.state.active],
                 trades: [],
             };
-            service[0].accounts.push(account);
-            let la = this.props.services;
-
-            this.props.changeState(la,pickedService);
-
-        }else{
-            alert("duplicate");
-        }
+            this.props.addAccount(account);
     }
+
+
 }
-
-Source.PropTypes = {
-    active: PropTypes.number.isRequired,
-    services: PropTypes.arrayOf(
-        PropTypes.shape({
-            id: PropTypes.number.isRequired,
-            accounts: PropTypes.array.isRequired,
-            provider: PropTypes.string.isRequired,
-            type: PropTypes.string.isRequired,
-            url: PropTypes.string.isRequired,
-            options: PropTypes.arrayOf(
-                PropTypes.shape({
-                    active: PropTypes.bool.isRequired,
-                    name: PropTypes.string.isRequired,
-                })
-            ).isRequired
-    })).isRequired,
-    changeState: PropTypes.func.isRequired,
-
+const mapStateToProps = (state) => {
+    return {
+        accounts: state.user.accounts,
+    };
 };
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        addAccount: (name) => {
+            dispatch(addAccount(name));
+        },
+    }
+};
+
+export default connect(mapStateToProps,mapDispatchToProps)(Source);
+
+

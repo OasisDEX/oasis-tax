@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-
 export default class Picker extends Component {
 
     constructor(props){
@@ -22,23 +21,20 @@ export default class Picker extends Component {
     }
 
     renderElements(){
-        return this.props.services.map((service) => (this.renderElement(service)));
+        return this.props.services.map((service, index) => (this.renderElement(service,index)));
     }
 
-    renderElement(service){
-
-        console.log(service.id);
+    renderElement(service, index){
         return(
-            <li className="list-group-item" key={service.id}>
+            <li className="list-group-item" key={index}>
             <div className="radio">
                 <label>
                     <input
                         type="radio"
-                        value={service.id}
+                        value={index}
                         name="myGroupName"
-                        checked={this.state.selectedOption == service.id}
+                        checked={this.state.selectedOption == index}
                         onChange={this.handleOptionChange.bind(this)}
-                        disabled={service.id !== 0}
                     />
                     <span className="picker-label">{service.provider}</span>
                 </label>
