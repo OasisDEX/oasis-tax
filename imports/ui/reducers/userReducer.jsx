@@ -1,5 +1,3 @@
-import update from 'react-addons-update';
-
 const providerReducer = (
     state = {
     accounts: {
@@ -14,10 +12,10 @@ const providerReducer = (
             state = {
                 accounts: {
                     ...state.accounts,
-                    ethereum: [...state.accounts.ethereum, action.payload]
+                    [action.payload.providerName]: [...state.accounts[action.payload.providerName], action.payload]
                 }
             };
-            return state;
+            break;
     }
     return state;
 };

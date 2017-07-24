@@ -88,7 +88,7 @@ import {addAccount} from "../../ui/actions/userActions"
     handleSubmit(accountName) {
             let account = {
                 name: accountName,
-                providerName: Provider[this.state.active],
+                providerName: Provider[this.state.active].name,
                 trades: [],
             };
             this.props.addAccount(account);

@@ -28,7 +28,7 @@ export default class Account extends Component {
 }
     checkVisibility(){
         if(this.props.providerIsVisible){
-            return this.props.account.provider;
+            return this.props.account.providerName;
         }
     }
 

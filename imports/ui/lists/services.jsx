@@ -25,8 +25,6 @@ export default class Services extends Component {
 
 
     renderAccount(account,index){
-        console.log("render" + account);
-        console.log(index);
         return (
             <Account account={account}
                      key={index}

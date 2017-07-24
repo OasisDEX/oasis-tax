@@ -36,7 +36,7 @@ export default class Picker extends Component {
                         checked={this.state.selectedOption == index}
                         onChange={this.handleOptionChange.bind(this)}
                     />
-                    <span className="picker-label">{service.provider}</span>
+                    <span className="picker-label">{service.name}</span>
                 </label>
             </div>
         </li>
