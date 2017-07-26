@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
-import Picker from '../lists/picker'
-import Services from "../lists/services";
-import InputGroup from "../elements/item_input";
+import Picker from '../components/picker'
+import Services from "../components/services";
+import InputGroup from "../components/item_input";
 import Provider from "../providers";
 import PropTypes from 'prop-types';
-import {addAccount,removeAccount} from "./../actions/userActions";
+import {addAccount,removeAccount} from "../actions/userActions";
 import { connect } from "react-redux";
 
 class Source extends Component {

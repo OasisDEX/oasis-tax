@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { createContainer } from 'meteor/react-meteor-data';
 import { connect } from "react-redux";
-import Source from "./components/source";
-import Export from "./components/export";
+import Source from "./container/source";
+import Export from "./container/export";
 
 
 class App extends Component {

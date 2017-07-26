@@ -1,5 +1,5 @@
 import React, {Component}  from 'react';
-import Services from './../lists/services';
+import Services from '../components/services';
 import {Link} from 'react-router-dom';
 import PropTypes from 'prop-types';
 import config from './../config.json';

@@ -1,22 +1,22 @@
 import React, {Component} from 'react';
 import { createContainer } from 'meteor/react-meteor-data';
-import Settings from "../lists/settings";
-import InputGroup from "../elements/item_input";
-import ListItemEmail from "../elements/item_email";
-import {setEmail,enableOption,disableOption} from "./../actions/settingsActions";
+import InputGroup from "../components/item_input";
+import ListItemEmail from "../components/item_email";
+import {setEmail,inverseOption} from "../actions/settingsActions";
 import { connect } from "react-redux";
+import ListItemOption from "../components/item_option";
 
 
 class Export extends Component {
-
-
     render(){
         return (
             <div className="panel panel-default">
             <div className="panel-heading">
                 Export Settings
             </div>
-                <Settings settings={this.props.settings}/>
+                <ul className="list-group export">
+                    {this.renderServices()}
+                </ul>
                 {this.renderEmailItem()}
                 <div className="panel-body">
                     <InputGroup placeHolder={"Enter Email Address "} handleSubmit={this.handleEmail.bind(this)}/>
@@ -24,11 +24,31 @@ class Export extends Component {
         </div>);
     }
 
+    renderServices() {
+        return this.props.settings.options.map((option) => this.renderOption(option));
+    }
+
+    renderOption(option){
+        return(
+            <ListItemOption
+                key={option.id}
+                option={option}
+                inverseOption={this.invOption.bind(this)}
+
+            />
+        );
+    }
+
+    invOption(option){
+            this.props.inverseOption(option);
+
+    }
+
     renderEmailItem(){
             return (
                 <ul className="list-group picker-container">
                     <ListItemEmail
-                        email={this.props.email}
+                        email={this.props.settings.email}
                     />
                 </ul>
             );
@@ -47,14 +67,10 @@ const mapStateToProps = (state) => {
     };
 };
 
-
 const mapDispatchToProps = (dispatch) => {
     return {
-        enableOption: (option) => {
-            dispatch(enableOption(option));
-        },
-        disableOption: (option) => {
-            dispatch(disableOption(name));
+        inverseOption: (option) => {
+            dispatch(inverseOption(option));
         },
         setEmail: (email) => {
             dispatch(setEmail(email));

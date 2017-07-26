@@ -1,26 +1,27 @@
 const settingsReducer = (
     state = {
         options:[
-            { "active": true, "name": "Load data from Oasis (https://oasisdex.com)" },
-            { "active": false, "name": "Load data from Etherdelta (https://ether.delta)" },
-            { "active": false, "name": "Alias IOU assets on Bitshares" }
+            {id:"oasis", active: true, name: "Load data from Oasis (https://oasisdex.com)" },
+            {id:"etherdelta", active: false, name: "Load data from Etherdelta (https://ether.delta)" },
+            {id:"bitshares", active: false, name: "Alias IOU assets on Bitshares" }
             ]
         ,
         email: ''
     }
     , action) => {
     switch(action.type){
-        case "ENABLE_OPTION":
+        case "INVERSE_OPTION":
             state = {
-            };
-            break;
-        case "DISABLE_OPTION":
-            state = {
+                ...state,
+                options: state.options.map(
+                    (option) => option.id === action.payload.id ? {...option, active: !action.payload.active} : option
+                )
             };
             break;
         case "SET_EMAIL":
             state = {
-
+                ...state,
+                email: action.payload
             };
             break;
     }

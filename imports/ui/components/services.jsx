@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 
 
-import Account from "../elements/item_account";
+import Account from "./item_account";
 
 
 export default class Services extends Component {

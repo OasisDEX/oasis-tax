@@ -1,13 +1,6 @@
-export function enableOption(option) {
+export function inverseOption(option) {
     return {
-        type: "ENABLE_OPTION",
-        payload: option
-    };
-}
-
-export function disableOption(option) {
-    return {
-        type: "DISABLE_OPTION",
+        type: "INVERSE_OPTION",
         payload: option
     };
 }
