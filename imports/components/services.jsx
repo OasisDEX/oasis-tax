@@ -17,9 +17,9 @@ export default class Services extends Component {
     }
 
     renderServices(){
-        return Object.keys(this.props.accounts)
-            .map((key) => this.props.accounts[key]
-                .map( (account,index) => this.renderAccount(account,index)));
+        return Object.keys(this.props.providers)
+            .map((key) => this.props.providers[key])
+            .map((providers) => providers.accounts.map((account,index)=> this.renderAccount(account,index)));
     }
 
 
@@ -35,8 +35,7 @@ export default class Services extends Component {
 }
 
 Services.PropTypes = {
-    accounts: PropTypes.object.isRequired,
-    providers: PropTypes.array.isRequired,
+    providers: PropTypes.object.isRequired,
     selectedProvider: PropTypes.number,
     isLoading: PropTypes.bool,
     removeAccount: PropTypes.func,

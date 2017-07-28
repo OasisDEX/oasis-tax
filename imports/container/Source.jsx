@@ -2,19 +2,11 @@ import React, {Component} from 'react';
 import Picker from '../components/picker'
 import Services from "../components/services";
 import InputGroup from "../components/item_input";
-import Provider from "../providers";
-import PropTypes from 'prop-types';
-import {addAccount,removeAccount} from "../actions/userActions";
+import {addAccount,removeAccount} from "../actions/providersActions";
+import {setPicker} from "../actions/settingsActions"
 import { connect } from "react-redux";
 
 class Source extends Component {
-
-    constructor(props){
-        super(props);
-        this.state = {
-            active: 0,
-        };
-    }
 
     render() {
         return (
@@ -24,7 +16,7 @@ class Source extends Component {
 
     renderElements(){
 
-        let placeHolder = "Enter " + Provider[this.state.active].name + " " + Provider[this.state.active].type;
+        let placeHolder = "Enter " + this.props.activeProvider + " " + this.props.providers[this.props.activeProvider].type;
 
         return(
             <div className="panel panel-default">
@@ -34,15 +26,14 @@ class Source extends Component {
                 </div>
 
                 <Services
-                    accounts={this.props.accounts}
-                    providers={Provider}
+                    providers={this.props.providers}
                     removeAccount={this.props.removeAccount}
                 />
 
                 <Picker
-                    services={Provider}
-                    active={this.state.active}
-                    changePlaceHolderText={this.changePlaceHolder.bind(this)}/>
+                    providers={this.props.providers}
+                    active={this.props.activeProvider}
+                    setActiveItem={this.props.setPicker}/>
 
                 <div className="panel-body">
                     <InputGroup
@@ -52,30 +43,24 @@ class Source extends Component {
         );
     }
 
-    changePlaceHolder(selectedSource){
-        this.setState({active: selectedSource});
-
-    }
 
     handleSubmit(accountName) {
-            let account = {
+            this.props.addAccount(
+                {
                 name: accountName,
-                providerName: Provider[this.state.active].name,
-                trades: [],
-            };
-            this.props.addAccount(account);
+                provider: this.props.activeProvider,
+                trades: []
+                }
+            );
     }
 
 
 }
 
-Source.PropTypes = {
-    accounts: PropTypes.object.isRequired
-};
-
 const mapStateToProps = (state) => {
     return {
-        accounts: state.user.accounts,
+        providers: state.providers,
+        activeProvider: state.settings.activeProvider
     };
 };
 
@@ -87,6 +72,9 @@ const mapDispatchToProps = (dispatch) => {
         },
         removeAccount: (name) => {
             dispatch(removeAccount(name));
+        },
+        setPicker: (provider) => {
+            dispatch(setPicker(provider));
         },
     }
 };

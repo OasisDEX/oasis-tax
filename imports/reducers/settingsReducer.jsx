@@ -6,7 +6,8 @@ const settingsReducer = (
             {id:"bitshares", active: false, name: "Alias IOU assets on Bitshares" }
             ]
         ,
-        email: ''
+        email: "",
+        activeProvider: "ethereum"
     }
     , action) => {
     switch(action.type){
@@ -22,6 +23,12 @@ const settingsReducer = (
             state = {
                 ...state,
                 email: action.payload
+            };
+            break;
+        case "SET_PICKER":
+            state = {
+                ...state,
+                activeProvider: action.payload
             };
             break;
     }

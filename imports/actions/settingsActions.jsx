@@ -11,3 +11,10 @@ export function setEmail(email) {
         payload: email
     };
 }
+
+export function setPicker(provider) {
+    return {
+        type: "SET_PICKER",
+        payload: provider
+    };
+}

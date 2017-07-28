@@ -11,3 +11,12 @@ export function removeAccount(account) {
         payload: account
     };
 }
+
+export function addTrade(trade) {
+    return {
+        type: "ADD_TRADE",
+        payload: trade
+    };
+}
+
+

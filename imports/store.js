@@ -1,12 +1,12 @@
 import { createStore, combineReducers, applyMiddleware } from 'redux';
 import logger from "redux-logger";
 
-import user from "./reducers/userReducer";
+import providers from "./reducers/providersReducer";
 import settings from "./reducers/settingsReducer";
 
 export default createStore(
     combineReducers({
-        user,
+        providers,
         settings
     }),
     {},

@@ -29,7 +29,7 @@ export default class Account extends Component {
 }
     checkVisibility(){
         if(this.props.providerIsVisible){
-            return this.props.account.providerName;
+            return this.props.account.provider;
         }
     }
 
@@ -68,7 +68,7 @@ export default class Account extends Component {
 }
 
 Account.PropTypes = {
-    account: PropTypes.object.isRequired,
+    account: PropTypes.array.isRequired,
     providerIsVisible: PropTypes.bool.isRequired,
     removeAccount: PropTypes.func,
 };

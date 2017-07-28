@@ -1,28 +1,27 @@
 import React, {Component}  from 'react';
 import Services from '../components/services';
 import {Link} from 'react-router-dom';
-import PropTypes from 'prop-types';
-import config from './../config.json';
-import oasisABI from './../abi_oasis.json';
-import etherdeltaABI from './../abi_etherdelta.json';
+import config from '../config.json';
+import oasisABI from '../abi_oasis.json';
+import etherdeltaABI from '../abi_etherdelta.json';
 import {createContainer} from 'meteor/react-meteor-data';
 import {HTTP} from 'meteor/http'
 import BN from 'bn.js';
 import EthUtils from 'ethereumjs-util';
 import Web3 from 'web3';
+import { connect } from "react-redux";
+import {addTrade} from "../actions/providersActions";
 
 
-export default class GenerateReportPage extends Component {
+class Report extends Component {
 
     constructor(props) {
         super(props);
 
         this.initWeb3();
-
-        console.log(this.props.services);
         this.state = {
             csv: this.initCSVHeader(),
-            oasis: GenerateReportPage.getSimpleMarketContract().at(config.oasis.contract.live.address),
+            oasis: Report.getSimpleMarketContract().at(config.oasis.contract.live.address),
             hasPayed: false,
             isLoading: false,
 
@@ -32,36 +31,26 @@ export default class GenerateReportPage extends Component {
     render() {
         return (
             <div>
-                {this.renderReport()}
-                {this.renderButtons()}
-            </div>
-        );
-
-    }
-
-    renderReport() {
-        return (
-            <div className="panel panel-default">
-                <div className="panel-heading">
-                    Generate Report
+                <div className="panel panel-default">
+                    <div className="panel-heading">
+                        Generate Report
+                    </div>
+                    <Services
+                        providers={this.props.providers}
+                        removeAccount={this.props.removeAccount}
+                    />
                 </div>
-                <Services
-                    services={this.props.services}
-                    isLoading={this.state.isLoading}
-                />
-            </div>);
-    }
-
-    renderButtons(){
-        return (
                 <div>
                     {this.generateButton()}
                     <Link to={'/'}>
                         <button type="button" className="btn btn-primary btn-back">Back</button>
                     </Link>
                 </div>
+            </div>
         );
+
     }
+
 
     generateButton() {
 
@@ -95,8 +84,7 @@ export default class GenerateReportPage extends Component {
     fetchData() {
         this.setLoading(true);
 
-        let ethService = this.props.services[0];
-        let ethAccounts = ethService.accounts;
+        let ethAccounts = this.props.providers.ethereum.accounts;
 
 
         let deltaPromises = [];
@@ -105,16 +93,14 @@ export default class GenerateReportPage extends Component {
 
         for (let i = 0; i < ethAccounts.length; i++) {
 
-            if(ethService.options[0].active){
-                console.log("fetching data from oasis");
-                oasisPromises.push(this.fetchAcceptedTrades(ethAccounts[i]));
-                oasisPromises.push(this.fetchIssuedTradesFor(ethAccounts[i]));
+            if(this.props.options[0].active){
+         //      oasisPromises.push(this.fetchAcceptedTrades(ethAccounts[i]));
+         //       oasisPromises.push(this.fetchIssuedTradesFor(ethAccounts[i]));
                 oasisPromises.push(this.fetchLegacyTrades(ethAccounts[i]));
             }
 
-            if(ethService.options[1].active){
-                console.log("fetching data from etherdelta");
-                this.fetchEtherdeltaTradesFromAllContracts(ethAccounts[i], deltaPromises);
+            if(this.props.options[1].active){
+         //       this.fetchEtherdeltaTradesFromAllContracts(ethAccounts[i], deltaPromises);
             }
         }
         this.fetch(oasisPromises, deltaPromises);
@@ -129,7 +115,7 @@ export default class GenerateReportPage extends Component {
           }).then((data) => {
             return Promise.all(this.fetchAllTimeStampsFromEtherdelta(data));
           }).then((data) => {
-            this.addEtherDeltaTrades(data);
+     //       this.addEtherDeltaTrades(data);
             this.setLoading(false);
             this.hasPayed(true);
         });
@@ -157,7 +143,15 @@ export default class GenerateReportPage extends Component {
                         const taker = EthUtils.addHexPrefix(data[i].taker);
                         const maker = EthUtils.addHexPrefix(data[i].maker);
                         if (taker === address.name || maker === address.name) {
-                            this.addOasisLegacyTradeFor(address, data[i])
+
+                            if (taker === address.name.toLowerCase()) {
+                                this.addOasisTradeFor(address, data[i], true, true);
+
+                            }
+
+                            if (maker === address.name.toLowerCase()) {
+                                this.addOasisTradeFor(address, data[i], false, true);
+                            }
                         }
                     }
 
@@ -271,37 +265,80 @@ export default class GenerateReportPage extends Component {
         });
     }
 
-    addOasisTradeFor(account,log){
+    addOasisTradeFor(account,log, taker, legacy){
 
-        let giveAmount = web3.fromWei(log.giveAmount.toString(10));
-        let takeAmount = web3.fromWei(log.takeAmount.toString(10));
-        let haveTokenAddress = log.haveToken;
-        let wantTokenAddress = log.wantToken;
-        let wantToken = config.tokens.live[haveTokenAddress];
-        let haveToken = config.tokens.live[wantTokenAddress];
-        let timestamp = new Date(log.timestamp * 1000).toLocaleString();
+        let buy_currency;
+        let buy_amount;
+
+        let sell_currency;
+        let sell_amount;
+
+        let haveTokenFromOffer;
+        let wantTokenFromOffer;
+
+        let haveAmount;
+        let wantAmount;
+
+        if(legacy){
+
+            haveTokenFromOffer = config.tokens.live[EthUtils.addHexPrefix(log.haveToken)];
+            wantTokenFromOffer = config.tokens.live[EthUtils.addHexPrefix(log.wantToken)];
+
+            haveAmount = web3.fromWei(new BN(log.giveAmount, 16).toString(10));
+            wantAmount = web3.fromWei(new BN(log.takeAmount, 16).toString(10));
+
+        }else {
+
+            haveTokenFromOffer = config.tokens.live[log.haveToken];
+            wantTokenFromOffer = config.tokens.live[log.wantToken];
+
+            haveAmount = web3.fromWei(log.giveAmount.toString(10));
+            wantAmount = web3.fromWei(log.takeAmount.toString(10));
+        }
+
+        if (taker){
+            console.log("taker");
+            buy_amount = wantAmount;
+            buy_currency = haveTokenFromOffer;
+
+            sell_amount = haveAmount;
+            sell_currency = wantTokenFromOffer;
+        }else {
+            console.log("maker");
+
+            buy_amount = wantAmount;
+            buy_currency = wantTokenFromOffer;
+
+            sell_amount = haveAmount;
+            sell_currency = haveTokenFromOffer;
+        }
 
         let trade = {
             'Type': 'Trade',
-            'Buy': takeAmount,
-            'Buy_Cur': wantToken,
-            'Sell': giveAmount,
-            'Sell_Cur': haveToken,
+            'Buy': buy_amount,                  //wantAmount
+            'Buy_Cur': buy_currency,            //wantToken
+            'Sell': sell_amount,                //haveAmount
+            'Sell_Cur': sell_currency,          //haveToken
             'Fee': '',
             'Fee_Cur': '',
             'Exchange': 'Oasisdex.com',
             'Group': '',
             'Comment': account.name,
-            'Date': timestamp,
+            'Date': new Date(log.timestamp * 1000).toLocaleString(),
         };
 
         //add trade to CSV
         this.addTradeToCSV(trade);
 
-        account.trades.push(trade);
-        this.updateUI();
-    }
+        let ctrade= {
+            trade: trade,
+            providerName: "ethereum",
+            accountName: account.name
+        };
 
+        this.props.addTrade(ctrade);
+    }
+/*
     addOasisLegacyTradeFor(account, log) {
 
         let giveAmount = web3.fromWei(new BN(log.giveAmount, 16).toString(10));
@@ -326,19 +363,20 @@ export default class GenerateReportPage extends Component {
             'Date': timestamp,
         };
 
+        let ctrade= {
+            trade: trade,
+            providerName: "ethereum",
+            accountName: account.name
+        }
+
+        this.props.addTrade(ctrade);
+
         //add trade to CSV
         this.addTradeToCSV(trade);
 
-        account.trades.push(trade);
-        this.updateUI();
 
     }
-
-    updateUI(){
-        let newService = this.props.services;
-        this.props.addAccount(newService);
-    }
-
+*/
     addEtherDeltaTrades(data) {
 
         for (let i = 0; i < data.length; i++) {
@@ -475,20 +513,20 @@ export default class GenerateReportPage extends Component {
     }
 }
 
-GenerateReportPage.PropTypes = {
-    services: PropTypes.arrayOf(
-        PropTypes.shape({
-            id: PropTypes.number.isRequired,
-            accounts: PropTypes.array.isRequired,
-            provider: PropTypes.string.isRequired,
-            type: PropTypes.string.isRequired,
-            url: PropTypes.string.isRequired,
-            options: PropTypes.arrayOf(
-                PropTypes.shape({
-                    active: PropTypes.bool.isRequired,
-                    option: PropTypes.string.isRequired,
-                })
-            ).isRequired
-        })).isRequired,
-    addAccount: PropTypes.func.isRequired,
+
+const mapStateToProps = (state) => {
+    return {
+        providers: state.providers,
+        options: state.settings.options
+    };
 };
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        addTrade: (trade) => {
+            dispatch(addTrade(trade));
+        },
+    }
+};
+
+export default connect(mapStateToProps,mapDispatchToProps)(Report);
