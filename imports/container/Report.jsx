@@ -5,12 +5,9 @@ import config from '../config.json';
 import oasisABI from '../abi_oasis.json';
 import etherdeltaABI from '../abi_etherdelta.json';
 import {createContainer} from 'meteor/react-meteor-data';
-import {HTTP} from 'meteor/http'
-import BN from 'bn.js';
-import EthUtils from 'ethereumjs-util';
 import Web3 from 'web3';
 import { connect } from "react-redux";
-import {addTrade} from "../actions/providersActions";
+import {getLegacyTrades} from "../actions/tradesActions";
 
 
 class Report extends Component {
@@ -82,6 +79,8 @@ class Report extends Component {
     }
 
     fetchData() {
+        this.props.getLegacyTrades(this.props.providers.ethereum.accounts[0]);
+        /*
         this.setLoading(true);
 
         let ethAccounts = this.props.providers.ethereum.accounts;
@@ -104,8 +103,9 @@ class Report extends Component {
             }
         }
         this.fetch(oasisPromises, deltaPromises);
-
+        */
     }
+
 
 
     fetch(oasisPromises, deltaPromises){
@@ -133,33 +133,6 @@ class Report extends Component {
         });
     }
 
-
-    fetchLegacyTrades(address) {
-        return new Promise((resolve, reject) => {
-            for (let j = 2; j < 15; j++) {
-                HTTP.get(Meteor.absoluteUrl("/maker-otc-" + j + ".trades.json"), (err, result) => {
-                    let data = result.data;
-                    for (let i = 0; i < data.length; i++) {
-                        const taker = EthUtils.addHexPrefix(data[i].taker);
-                        const maker = EthUtils.addHexPrefix(data[i].maker);
-                        if (taker === address.name || maker === address.name) {
-
-                            if (taker === address.name.toLowerCase()) {
-                                this.addOasisTradeFor(address, data[i], true, true);
-
-                            }
-
-                            if (maker === address.name.toLowerCase()) {
-                                this.addOasisTradeFor(address, data[i], false, true);
-                            }
-                        }
-                    }
-
-                });
-            }
-            resolve();
-        });
-    }
 
     // address tokenGet, uint amountGet, address tokenGive, uint amountGive, address get, address give
 
@@ -265,122 +238,11 @@ class Report extends Component {
         });
     }
 
-    addOasisTradeFor(account,log, taker, legacy){
-
-        let buy_currency;
-        let buy_amount;
-
-        let sell_currency;
-        let sell_amount;
-
-        let haveTokenFromOffer;
-        let wantTokenFromOffer;
-
-        let haveAmount;
-        let wantAmount;
-
-        if(legacy){
-
-            haveTokenFromOffer = config.tokens.live[EthUtils.addHexPrefix(log.haveToken)];
-            wantTokenFromOffer = config.tokens.live[EthUtils.addHexPrefix(log.wantToken)];
-
-            haveAmount = web3.fromWei(new BN(log.giveAmount, 16).toString(10));
-            wantAmount = web3.fromWei(new BN(log.takeAmount, 16).toString(10));
-
-        }else {
-
-            haveTokenFromOffer = config.tokens.live[log.haveToken];
-            wantTokenFromOffer = config.tokens.live[log.wantToken];
-
-            haveAmount = web3.fromWei(log.giveAmount.toString(10));
-            wantAmount = web3.fromWei(log.takeAmount.toString(10));
-        }
-
-        if (taker){
-            console.log("taker");
-            buy_amount = wantAmount;
-            buy_currency = haveTokenFromOffer;
-
-            sell_amount = haveAmount;
-            sell_currency = wantTokenFromOffer;
-        }else {
-            console.log("maker");
-
-            buy_amount = wantAmount;
-            buy_currency = wantTokenFromOffer;
-
-            sell_amount = haveAmount;
-            sell_currency = haveTokenFromOffer;
-        }
-
-        let trade = {
-            'Type': 'Trade',
-            'Buy': buy_amount,                  //wantAmount
-            'Buy_Cur': buy_currency,            //wantToken
-            'Sell': sell_amount,                //haveAmount
-            'Sell_Cur': sell_currency,          //haveToken
-            'Fee': '',
-            'Fee_Cur': '',
-            'Exchange': 'Oasisdex.com',
-            'Group': '',
-            'Comment': account.name,
-            'Date': new Date(log.timestamp * 1000).toLocaleString(),
-        };
-
-        //add trade to CSV
-        this.addTradeToCSV(trade);
-
-        let ctrade= {
-            trade: trade,
-            providerName: "ethereum",
-            accountName: account.name
-        };
-
-        this.props.addTrade(ctrade);
-    }
-/*
-    addOasisLegacyTradeFor(account, log) {
-
-        let giveAmount = web3.fromWei(new BN(log.giveAmount, 16).toString(10));
-        let takeAmount = web3.fromWei(new BN(log.takeAmount, 16).toString(10));
-        let haveTokenAddress = EthUtils.addHexPrefix(log.haveToken);
-        let wantTokenAddress = EthUtils.addHexPrefix(log.wantToken);
-        let wantToken = config.tokens.live[haveTokenAddress];
-        let haveToken = config.tokens.live[wantTokenAddress];
-        let timestamp = new Date(log.timestamp * 1000).toLocaleString();
-
-        let trade = {
-            'Type': 'Trade',
-            'Buy': takeAmount,
-            'Buy_Cur': wantToken,
-            'Sell': giveAmount,
-            'Sell_Cur': haveToken,
-            'Fee': '',
-            'Fee_Cur': '',
-            'Exchange': 'Oasisdex.com',
-            'Group': '',
-            'Comment': account.name,
-            'Date': timestamp,
-        };
-
-        let ctrade= {
-            trade: trade,
-            providerName: "ethereum",
-            accountName: account.name
-        }
-
-        this.props.addTrade(ctrade);
-
-        //add trade to CSV
-        this.addTradeToCSV(trade);
 
 
-    }
-*/
     addEtherDeltaTrades(data) {
 
         for (let i = 0; i < data.length; i++) {
-
 
             let giveAmount = web3.fromWei(data[i].log.args.amountGive.toString(10));
             let takeAmount = web3.fromWei(data[i].log.args.amountGet.toString(10));
@@ -523,9 +385,9 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        addTrade: (trade) => {
-            dispatch(addTrade(trade));
-        },
+        getLegacyTrades: (address) => {
+            dispatch(getLegacyTrades(address));
+        }
     }
 };
 

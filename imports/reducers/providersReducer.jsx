@@ -33,6 +33,8 @@ const providerReducer = (
                 }
             };
             break;
+        case "GET_LEGACY_TRADES_FULFILLED":
+            break;
     }
     return state;
 };

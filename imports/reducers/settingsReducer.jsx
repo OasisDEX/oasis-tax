@@ -7,7 +7,9 @@ const settingsReducer = (
             ]
         ,
         email: "",
-        activeProvider: "ethereum"
+        activeProvider: "ethereum",
+        hasPayed: false,
+        isLoading: false
     }
     , action) => {
     switch(action.type){

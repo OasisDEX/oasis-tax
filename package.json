@@ -8,6 +8,7 @@
     "babel-runtime": "^6.23.0",
     "bn.js": "^4.11.7",
     "ethereumjs-util": "^5.1.2",
+    "ethjs-unit": "^0.1.6",
     "history": "^4.6.3",
     "immutability-helper": "^2.3.0",
     "meteor-node-stubs": "^0.2.11",
@@ -20,6 +21,8 @@
     "react-router-dom": "^4.1.2",
     "redux": "^3.7.2",
     "redux-logger": "^3.0.6",
+    "redux-promise-middleware": "^4.2.1",
+    "redux-thunk": "^2.2.0",
     "web3": "^0.19.1"
   },
   "devDependencies": {

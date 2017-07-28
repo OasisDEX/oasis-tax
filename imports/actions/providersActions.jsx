@@ -1,3 +1,4 @@
+
 export function addAccount(account) {
     return {
         type: "ADD_ACCOUNT",
@@ -18,5 +19,7 @@ export function addTrade(trade) {
         payload: trade
     };
 }
+
+
 
 
