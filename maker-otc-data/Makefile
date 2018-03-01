@@ -6,10 +6,8 @@ endef
 
 export SETH_ABI = $(shell seth abi '$(abi)')
 
-%.tx.json: %.tx.id
-	seth tx `cat $<` --json >$@ || { rm $@; exit 1; }
-%.address: %.tx.json
-	jshon <$< -e creates -u >$@ || { rm $@; exit 1; }
+%.address: %.tx.id
+	seth receipt `cat $<` contractAddress >$@ || { rm $@; exit 1; }
 %.logs: %.address
 	seth logs `cat $<` >$@ || { rm $@; exit 1; }
 %.events: %.logs
